@@ -47,10 +47,19 @@ public class Main extends Activity {
 				}
 			};
 
+			// List of the relative paths
 			String[] fList = path.list(filter);
-			for (String rhizomeFile : fList) {
-				Log.v(TAG, "Found " + rhizomeFile);
+			// List of the RhizomeFile 
+			RhizomeFile[] rList = new RhizomeFile[fList.length];
+			
+			for (int i = 0; i < rList.length; i++) {
+				rList[i] = new RhizomeFile(path, fList[i]);
+				Log.v(TAG, rList[i].toString());
 			}
+			
+			
+			
+			
 	
 		} else { // The pass does not exist
 			Log.e(TAG, "No serval-rhizome path found on the SD card.");
