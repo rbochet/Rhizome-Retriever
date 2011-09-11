@@ -202,20 +202,42 @@ public class RhizomeFile {
 	 */
 	public static void GenerateMetaForFilename(String fileName) {
 		try {
-			Properties meta = new Properties();
+			Properties metaP = new Properties();
+
 			// Setup the property object
-			meta.put("date", System.currentTimeMillis() + "");
-			meta.put("read", false + ""); // the file is just created
-			meta.put("marked_expiration", false + ""); // Just imported
+			metaP.put("date", System.currentTimeMillis() + "");
+			metaP.put("read", false + ""); // the file is just created
+			metaP.put("marked_expiration", false + ""); // Just imported
 
 			// Save the file
 			File tmpMeta = new File(Main.dirRhizome, "." + fileName + ".meta");
 			Log.v(TAG, tmpMeta + "");
-			meta.store(new FileOutputStream(tmpMeta), "Rhizome meta data for "
+			metaP.store(new FileOutputStream(tmpMeta), "Rhizome meta data for "
 					+ fileName);
 		} catch (Exception e) {
 			Log.e(TAG, "Error when creating meta for " + fileName);
 		}
 	}
 
+	public static void GenerateManifestForFilename(String fileName, String author,
+			float version) {
+		try {
+			Properties manifestP = new Properties();
+			
+			// Set up the property object
+			manifestP.put("author", author);
+			manifestP.put("name", fileName);
+			manifestP.put("version", version+"");
+			manifestP.put("date", System.currentTimeMillis()+"");
+			
+			// Save the file
+			File tmpManifest = new File(Main.dirRhizome, "." + fileName + ".manifest");
+			Log.v(TAG, tmpManifest +"");
+			manifestP.store(new FileOutputStream(tmpManifest), "Rhizome manifest data for "
+					+ fileName);
+		} catch (IOException e) {
+			Log.e(TAG, "Error when creating manifest for " + fileName);
+		}
+		
+	}
 }

@@ -1,7 +1,6 @@
 package org.servalproject.rr;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
@@ -83,8 +82,12 @@ public class Main extends ListActivity implements OnClickListener {
 	private void importFile(String fileName) {
 		try {
 			File file = new File(fileName);
+			// Move the actual file
 			RhizomeFile.CopyFileToDir(file, dirRhizome);
+			// Create silently the meta data
 			RhizomeFile.GenerateMetaForFilename(file.getName()); // Just the name, no path
+			// Ask data for creating the Manifest
+			RhizomeFile.GenerateManifestForFilename(file.getName(), "Romain", 0.3f);
 			// Reset the UI
 			setUpUI();
 			// Alright
