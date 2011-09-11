@@ -148,22 +148,51 @@ public class Main extends ListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
-		Log.v(TAG, "Context menu pressed: "+info.id);
+		Log.v(TAG, "Context menu pressed: " + info.id);
 		switch (item.getItemId()) {
-		
+
 		// Delete the file
 		case R.id.cm_delete:
-			rList[(int)info.id].delete();
+			rList[(int) info.id].delete();
 			return true;
-		// Export the file in a known folder
+			// Export the file in a known folder
 		case R.id.cm_export:
-			rList[(int)info.id].export();
+			rList[(int) info.id].export();
 			return true;
 		case R.id.cm_mark:
-			rList[(int)info.id].markForExpiration();
+			rList[(int) info.id].markForExpiration();
 			return true;
 		default:
 			return super.onContextItemSelected(item);
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.m_import:
+			importFile();
+			return true;
+		case R.id.m_new_keys:
+			createKeyPair();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Create a new key pair.
+	 * Delete the old one if still presents.
+	 */
+	private void createKeyPair() {
+		Log.e(TAG, "TODO : createKeyPair()");
+	}
+
+	/**
+	 * Import a file in the 
+	 */
+	private void importFile() {
+		Log.e(TAG, "TODO : importFile()");
 	}
 }
