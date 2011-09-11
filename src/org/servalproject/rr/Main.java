@@ -1,6 +1,7 @@
 package org.servalproject.rr;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
@@ -139,7 +140,7 @@ public class Main extends ListActivity implements OnClickListener {
 				rList[(int) info.id].delete();
 				// Need also to reset the UI
 				setUpUI();
-
+				// Alright
 				goToast("Deletion successed.");
 			} catch (IOException e1) {
 				Log.e(TAG, "Deletion failed.");
@@ -157,7 +158,13 @@ public class Main extends ListActivity implements OnClickListener {
 			}
 			return true;
 		case R.id.cm_mark:
-			rList[(int) info.id].markForExpiration();
+			try {
+				rList[(int) info.id].markForExpiration();
+				goToast("Marked for expiration.");
+			} catch (IOException e) {
+				Log.e(TAG, "Impossible to mark for expiration");
+				goToast("Impossible to mark for expiration.");
+			}
 			return true;
 		default:
 			return super.onContextItemSelected(item);

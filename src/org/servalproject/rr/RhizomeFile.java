@@ -132,11 +132,18 @@ public class RhizomeFile {
 	}
 
 	/**
-	 * mark the file for expiration
+	 * Mark the file for expiration (put true in marked_expiration key)
+	 * 
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public void markForExpiration() {
-		Log.e(TAG, "TODO : markForExpiration()");
-
+	public void markForExpiration() throws FileNotFoundException, IOException {
+		Properties metaP = new Properties();
+		metaP.load(new FileInputStream(meta));
+		metaP.remove("marked_expiration");
+		metaP.put("marked_expiration", true + "");
+		metaP.store(new FileOutputStream(meta),
+				"Rhizome meta data for " + file.getName());
 	}
 
 	/**
@@ -203,7 +210,7 @@ public class RhizomeFile {
 
 			// Save the file
 			File tmpMeta = new File(Main.dirRhizome, "." + fileName + ".meta");
-			Log.v(TAG, tmpMeta+"");
+			Log.v(TAG, tmpMeta + "");
 			meta.store(new FileOutputStream(tmpMeta), "Rhizome meta data for "
 					+ fileName);
 		} catch (Exception e) {
