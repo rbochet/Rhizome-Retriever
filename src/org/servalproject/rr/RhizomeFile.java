@@ -30,7 +30,7 @@ public class RhizomeFile {
 	 * @throws IOException
 	 *             Everything fails sometimes
 	 */
-	private static void CopyFileToDir(File sourceFile, File destDir)
+	protected static void CopyFileToDir(File sourceFile, File destDir)
 			throws IOException {
 
 		File destFile = new File(destDir, sourceFile.getName());

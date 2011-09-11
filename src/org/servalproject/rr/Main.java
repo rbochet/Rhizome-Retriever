@@ -37,7 +37,6 @@ public class Main extends ListActivity implements OnClickListener {
 	/** The file picker dialog */
 	private FolderPicker mFileDialog;
 
-
 	/** TAG for debugging */
 	public static final String TAG = "R2";
 
@@ -51,6 +50,10 @@ public class Main extends ListActivity implements OnClickListener {
 	public static final File dirExport = new File(
 			Environment.getExternalStorageDirectory()
 					+ "/serval-rhizome-export");
+
+	/** Rhizome's home directory */
+	public static final File dirRhizome = new File(
+			Environment.getExternalStorageDirectory() + "/serval-rhizome");
 
 	/**
 	 * Create a new key pair. Delete the old one if still presents.
@@ -71,26 +74,33 @@ public class Main extends ListActivity implements OnClickListener {
 	}
 
 	/**
-	 * Import a file in the
+	 * Import a file in the Rhizome directory
+	 * 
+	 * @param fileName
+	 *            The path of the file we need to import
 	 */
-	private void importFile() {
-		Log.e(TAG, "TODO : importFile()");
-		mFileDialog = new FolderPicker(this, this, android.R.style.Theme, true);
-		mFileDialog.show();
-
+	private void importFile(String fileName) {
+		try {
+			File file = new File(fileName);
+			RhizomeFile.CopyFileToDir(file, dirRhizome);
+			// Reset the UI
+			setUpUI();
+			// Alright
+			goToast("Success: " + file.getName() + " imported.");
+		} catch (IOException e) {
+			Log.e(TAG, "Importation failed.");
+			goToast("Importation failed.");
+		}
 	}
 
 	/**
 	 * List files of the directory serval on the SD Card
 	 */
 	private void listFiles() {
-
-		File path = new File(Environment.getExternalStorageDirectory()
-				+ "/serval-rhizome");
-		Log.v(TAG, path.getAbsolutePath());
+		Log.v(TAG, dirRhizome.getAbsolutePath());
 
 		// If the path exists, list all the non-hidden files (no dir)
-		if (path.exists()) {
+		if (dirRhizome.exists()) {
 			FilenameFilter filter = new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String filename) {
@@ -100,12 +110,12 @@ public class Main extends ListActivity implements OnClickListener {
 			};
 
 			// List of the relative paths
-			fList = path.list(filter);
+			fList = dirRhizome.list(filter);
 			// List of the RhizomeFile
 			rList = new RhizomeFile[fList.length];
 
 			for (int i = 0; i < rList.length; i++) {
-				rList[i] = new RhizomeFile(path, fList[i]);
+				rList[i] = new RhizomeFile(dirRhizome, fList[i]);
 				Log.v(TAG, rList[i].toString());
 			}
 
@@ -210,7 +220,9 @@ public class Main extends ListActivity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.m_import:
-			importFile();
+			mFileDialog = new FolderPicker(this, this, android.R.style.Theme,
+					true);
+			mFileDialog.show();
 			return true;
 		case R.id.m_new_keys:
 			createKeyPair();
@@ -245,10 +257,7 @@ public class Main extends ListActivity implements OnClickListener {
 	public void onClick(DialogInterface dialog, int which) {
 		if (dialog == mFileDialog) { // security, not really needed
 			String path = mFileDialog.getPath();
-			if (path == null) {
-				path = "no file selected";
-			}
-			goToast(path);
+			importFile(path);
 		}
 
 	}
