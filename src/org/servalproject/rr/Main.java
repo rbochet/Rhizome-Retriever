@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -125,7 +127,7 @@ public class Main extends ListActivity {
 				Toast.LENGTH_SHORT).show();
 
 	}
-	
+
 	/**
 	 * Process a short click received from the list view
 	 * 
@@ -136,19 +138,26 @@ public class Main extends ListActivity {
 	 */
 	private void processClick(int position, long id) {
 		try {
-			Intent myIntent = new Intent(
-					android.content.Intent.ACTION_VIEW, Uri
-							.parse("file://"
-									+ rList[(int) id].getFile()
-											.getAbsolutePath()));
+			Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW,
+					Uri.parse("file://"
+							+ rList[(int) id].getFile().getAbsolutePath()));
 
 			startActivity(myIntent);
 		} catch (Exception e) {
 			Log.e(TAG, "Not possible to resolve this intent. Shit.");
 			Toast.makeText(getApplicationContext(),
-					"This file cannot be opened from here.",
-					Toast.LENGTH_SHORT).show();
+					"This file cannot be opened from here.", Toast.LENGTH_SHORT)
+					.show();
 
 		}
 	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+
+
 }
