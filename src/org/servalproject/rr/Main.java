@@ -9,12 +9,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -60,10 +61,12 @@ public class Main extends ListActivity {
 				processClick(position, id);
 
 			}
-		});
+		}); 
+		
+		registerForContextMenu(getListView());
 
 		// The long press behavior
-		lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+		/*lv.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -75,7 +78,7 @@ public class Main extends ListActivity {
 				// If false is returned, click takes over
 				return true;
 			}
-		});
+		});*/
 
 	}
 
@@ -159,5 +162,11 @@ public class Main extends ListActivity {
 		return true;
 	}
 
-
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+	                                ContextMenuInfo menuInfo) {
+	  super.onCreateContextMenu(menu, v, menuInfo);
+	  MenuInflater inflater = getMenuInflater();
+	  inflater.inflate(R.menu.context_menu, menu);
+	}
 }

@@ -4,4 +4,7 @@
     <string name="app_name">Rhizome Retriever</string>
     <string name="m_import">Import</string>
     <string name="m_new_keys">KeyGen</string>
+    <string name="cm_export">Export</string>
+    <string name="cm_delete">Delete</string>
+    <string name="cm_mark">Mark for expiration</string>
 </resources>
