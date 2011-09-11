@@ -9,7 +9,24 @@
 	<string name="cm_export">Export</string>
 	<string name="cm_delete">Delete</string>
 	<string name="cm_mark">Mark for expiration</string>
+	<string name="cm_vcert">View Manifest</string>
 	<!-- For the picker -->
 	<string name="pick_file">Pick File</string>
 	<string name="pick_folder">Pick Folder</string>
+	<!-- For the manifest editor -->
+	<string name="me_fill">Complete the manifest</string>
+	<string name="me_validate_fill">Publish the manifest</string>
+	<string name="me_author_fill">Author:</string>
+	<string name="me_version_fill">Version:</string>
+	<string name="me_name">Create the manifest</string>
+	<!-- For the manifest viewer -->
+	<string name="mv_name_p">File name: </string>
+	<string name="mv_size_p">Size:</string>
+	<string name="mv_author_p">Author:</string>
+	<string name="mv_date_p">Creation timestamp:</string>
+	<string name="mv_version_p">Version:</string>
+	<string name="mv_hash_p">Hash:</string>
+	<string name="mv_back">Back</string>
+	<string name="mv_name">View the manifest</string>
+	
 </resources>

@@ -4,4 +4,5 @@
     <item android:visible="true" android:title="@string/cm_export" android:enabled="true" android:checkable="false" android:id="@+id/cm_export" android:icon="@drawable/ic_cm_export"></item>
     <item android:visible="true" android:title="@string/cm_delete" android:checkable="false" android:id="@+id/cm_delete" android:icon="@drawable/ic_cm_delete"></item>
     <item android:id="@+id/cm_mark" android:visible="true" android:title="@string/cm_mark" android:checkable="false" android:icon="@drawable/ic_cm_mark"></item>
+    <item android:id="@+id/cm_vcert" android:title="@string/cm_vcert" android:checkable="false" android:visible="true"></item>
 </menu>

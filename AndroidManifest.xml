@@ -12,6 +12,11 @@
 			</intent-filter>
 		</activity>
 		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+		<activity android:name="ManifestEditorActivity"
+			android:label="@string/me_name" />
+		<activity android:name="ManifestViewActivity"
+			android:label="@string/mv_name" />
+
 
 	</application>
 </manifest>

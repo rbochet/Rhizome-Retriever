@@ -56,6 +56,12 @@ public class Main extends ListActivity implements OnClickListener {
 			Environment.getExternalStorageDirectory() + "/serval-rhizome");
 
 	/**
+	 * Var used to ensure that the return of the activity comes from the
+	 * manifest filling view
+	 */
+	private static final int FILL_MANIFEST = 0;
+
+	/**
 	 * Create a new key pair. Delete the old one if still presents.
 	 */
 	private void createKeyPair() {
@@ -74,7 +80,9 @@ public class Main extends ListActivity implements OnClickListener {
 	}
 
 	/**
-	 * Import a file in the Rhizome directory
+	 * Import a file in the Rhizome directory. Generates automatically the
+	 * associated meta file, amd ask the user the relevant informations for
+	 * building a manifest file.
 	 * 
 	 * @param fileName
 	 *            The path of the file we need to import
@@ -85,13 +93,15 @@ public class Main extends ListActivity implements OnClickListener {
 			// Move the actual file
 			RhizomeFile.CopyFileToDir(file, dirRhizome);
 			// Create silently the meta data
-			RhizomeFile.GenerateMetaForFilename(file.getName()); // Just the name, no path
+			RhizomeFile.GenerateMetaForFilename(file.getName());
 			// Ask data for creating the Manifest
-			RhizomeFile.GenerateManifestForFilename(file.getName(), "Romain", 0.3f);
-			// Reset the UI
-			setUpUI();
-			// Alright
-			goToast("Success: " + file.getName() + " imported.");
+			Intent myIntent = new Intent(this.getBaseContext(),
+					ManifestEditorActivity.class);
+			myIntent.putExtra("fileName", file.getName());
+			myIntent.putExtra("size", file.length());
+			startActivityForResult(myIntent, FILL_MANIFEST);
+			// --> the result will be back in onAcRes
+
 		} catch (IOException e) {
 			Log.e(TAG, "Importation failed.");
 			goToast("Importation failed.");
@@ -126,6 +136,39 @@ public class Main extends ListActivity implements OnClickListener {
 
 		} else { // The pass does not exist
 			Log.e(TAG, "No serval-rhizome path found on the SD card.");
+		}
+
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == FILL_MANIFEST) { // Comes back from the manifest
+											// filling activity
+			if (resultCode == RESULT_OK) {
+				// Get the parameters
+				String fileName = data.getExtras().getString("fileName");
+				long size = data.getExtras().getLong("size");
+				String author = data.getExtras().getString("author");
+				float version = Float.parseFloat(data.getExtras().getString(
+						"version"));
+
+				// Creates the manifest
+				RhizomeFile.GenerateManifestForFilename(fileName, author,
+						version, size);
+				// Reset the UI
+				setUpUI();
+				// Alright
+				goToast("Success: " + fileName + " imported.");
+
+			}
+		}
+	}
+
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		if (dialog == mFileDialog) { // security, not really needed
+			String path = mFileDialog.getPath();
+			importFile(path);
 		}
 
 	}
@@ -169,6 +212,19 @@ public class Main extends ListActivity implements OnClickListener {
 				goToast("Impossible to mark for expiration.");
 			}
 			return true;
+		case R.id.cm_vcert:
+			try {
+				// Create the empty intent
+				Intent intent = new Intent(this.getBaseContext(), ManifestViewActivity.class);
+				// Populate it 
+				intent = rList[(int) info.id].populateDisplayIntent(intent);
+				// Send it
+				startActivity(intent);
+			} catch (IOException e) {
+				Log.e(TAG, "Impossible to read the manifest.");
+				goToast("Error while reading the manifest.");
+			}
+			return true;
 		default:
 			return super.onContextItemSelected(item);
 		}
@@ -180,35 +236,6 @@ public class Main extends ListActivity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 
 		setUpUI();
-
-	}
-
-	/**
-	 * Set up the interface based on the list of files
-	 */
-	private void setUpUI() {
-		listFiles();
-
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, fList));
-
-		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
-
-		// The click behavior
-		lv.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.v(TAG, rList[(int) id].getFile().toString());
-
-				// Process the click
-				processClick(position, id);
-
-			}
-		});
-
-		// Register the context menu
-		registerForContextMenu(getListView());
 
 	}
 
@@ -264,12 +291,32 @@ public class Main extends ListActivity implements OnClickListener {
 		}
 	}
 
-	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		if (dialog == mFileDialog) { // security, not really needed
-			String path = mFileDialog.getPath();
-			importFile(path);
-		}
+	/**
+	 * Set up the interface based on the list of files
+	 */
+	private void setUpUI() {
+		listFiles();
+
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, fList));
+
+		ListView lv = getListView();
+		lv.setTextFilterEnabled(true);
+
+		// The click behavior
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Log.v(TAG, rList[(int) id].getFile().toString());
+
+				// Process the click
+				processClick(position, id);
+
+			}
+		});
+
+		// Register the context menu
+		registerForContextMenu(getListView());
 
 	}
 }

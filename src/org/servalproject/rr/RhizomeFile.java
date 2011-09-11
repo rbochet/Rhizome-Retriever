@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
 
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -219,25 +220,62 @@ public class RhizomeFile {
 		}
 	}
 
-	public static void GenerateManifestForFilename(String fileName, String author,
-			float version) {
+	/**
+	 * Create a manifest file for the imported file. The timestamp is set at the
+	 * current value.
+	 * 
+	 * @param fileName
+	 *            Name of the file
+	 * @param author
+	 *            Author of the file
+	 * @param version
+	 *            Version of the file
+	 * @param size
+	 */
+	public static void GenerateManifestForFilename(String fileName,
+			String author, float version, long size) {
 		try {
 			Properties manifestP = new Properties();
-			
+
 			// Set up the property object
 			manifestP.put("author", author);
 			manifestP.put("name", fileName);
-			manifestP.put("version", version+"");
-			manifestP.put("date", System.currentTimeMillis()+"");
+			manifestP.put("version", version + "");
+			manifestP.put("date", System.currentTimeMillis() + "");
+			manifestP.put("size", size + "");
 			
 			// Save the file
-			File tmpManifest = new File(Main.dirRhizome, "." + fileName + ".manifest");
-			Log.v(TAG, tmpManifest +"");
-			manifestP.store(new FileOutputStream(tmpManifest), "Rhizome manifest data for "
-					+ fileName);
+			File tmpManifest = new File(Main.dirRhizome, "." + fileName
+					+ ".manifest");
+			Log.v(TAG, tmpManifest + "");
+			manifestP.store(new FileOutputStream(tmpManifest),
+					"Rhizome manifest data for " + fileName);
 		} catch (IOException e) {
 			Log.e(TAG, "Error when creating manifest for " + fileName);
 		}
+
+	}
+
+	/**
+	 * This function populates an Intent for the manifest
+	 * 
+	 * @return The manifest wrapped in an Intent
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	public Intent populateDisplayIntent(Intent intent) throws FileNotFoundException, IOException {
+		// Load the properties
+		Properties manifestP = new Properties();
+		manifestP.load(new FileInputStream(manifest));
 		
+		// Populate the intent
+		intent.putExtra("author", manifestP.getProperty("author"));
+		intent.putExtra("hash", manifestP.getProperty("hash"));
+		intent.putExtra("version", manifestP.getProperty("version"));
+		intent.putExtra("date", manifestP.getProperty("date"));
+		intent.putExtra("size", manifestP.getProperty("size"));
+		intent.putExtra("name", manifestP.getProperty("name"));
+		
+		return intent;
 	}
 }
