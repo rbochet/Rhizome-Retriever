@@ -4,6 +4,10 @@
 package org.servalproject.rr;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 import android.util.Log;
 
@@ -12,7 +16,7 @@ import android.util.Log;
  *         actual file (ie <file>) - The .<file>.manifest - The .<file>.meta
  */
 public class RhizomeFile {
-	
+
 	/** TAG for debugging */
 	public static final String TAG = "R2";
 
@@ -117,11 +121,15 @@ public class RhizomeFile {
 	}
 
 	/**
-	 * Export the file in the given rep
+	 * Export the file in the given dir.
+	 * The directory is defined in the main app.
+	 * 
+	 * @throws IOException
+	 *             If the copy fails.
 	 */
-	public void export() {
-		Log.e(TAG, "TODO : export()");
-		
+	public void export() throws IOException {
+		Log.e(TAG, "TODO: export()");
+		CopyFileToDir(file, Main.dirExport);
 	}
 
 	/**
@@ -129,7 +137,43 @@ public class RhizomeFile {
 	 */
 	public void markForExpiration() {
 		Log.e(TAG, "TODO : markForExpiration()");
+
+	}
+
+	/**
+	 * Copy a file.
+	 * 
+	 * @param sourceFile
+	 *            The source
+	 * @param destFile
+	 *            The dest
+	 * @throws IOException
+	 *             Everything fails sometimes
+	 */
+	private static void CopyFileToDir(File sourceFile, File destDir)
+			throws IOException {
 		
+		File destFile = new File(destDir, sourceFile.getName());
+		
+		if (!destFile.exists()) {
+			destFile.createNewFile();
+		}
+
+		FileChannel source = null;
+		FileChannel destination = null;
+
+		try {
+			source = new FileInputStream(sourceFile).getChannel();
+			destination = new FileOutputStream(destFile).getChannel();
+			destination.transferFrom(source, 0, source.size());
+		} finally {
+			if (source != null) {
+				source.close();
+			}
+			if (destination != null) {
+				destination.close();
+			}
+		}
 	}
 
 }

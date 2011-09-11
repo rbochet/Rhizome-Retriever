@@ -2,6 +2,7 @@ package org.servalproject.rr;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -34,10 +35,15 @@ public class Main extends ListActivity {
 	public static final String TAG = "R2";
 
 	/** The list of file names */
-	String[] fList = null;
+	private String[] fList = null;
 
 	/** The list of logical files */
-	RhizomeFile[] rList = null;
+	private RhizomeFile[] rList = null;
+
+	/** Directory where the files are exported */
+	public static final File dirExport = new File(
+			Environment.getExternalStorageDirectory()
+					+ "/serval-rhizome-export");
 
 	/** Called when the activity is first created. */
 	@Override
@@ -122,10 +128,7 @@ public class Main extends ListActivity {
 			startActivity(myIntent);
 		} catch (Exception e) {
 			Log.e(TAG, "Not possible to resolve this intent. Shit.");
-			Toast.makeText(getApplicationContext(),
-					"This file cannot be opened from here.", Toast.LENGTH_SHORT)
-					.show();
-
+			goToast("This file cannot be opened from here.");
 		}
 	}
 
@@ -157,7 +160,13 @@ public class Main extends ListActivity {
 			return true;
 			// Export the file in a known folder
 		case R.id.cm_export:
-			rList[(int) info.id].export();
+			try {
+				rList[(int) info.id].export();
+				goToast("Export successed.");
+			} catch (IOException e) { // The copy failed. Warn the user
+				Log.e(TAG, "Export failed.");
+				goToast("Export failed.");
+			}
 			return true;
 		case R.id.cm_mark:
 			rList[(int) info.id].markForExpiration();
@@ -165,6 +174,16 @@ public class Main extends ListActivity {
 		default:
 			return super.onContextItemSelected(item);
 		}
+	}
+
+	/**
+	 * Display a toast message in a short popup
+	 * 
+	 * @param text The text displayed
+	 */
+	private void goToast(String text) {
+		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT)
+				.show();
 	}
 
 	@Override
@@ -182,15 +201,14 @@ public class Main extends ListActivity {
 	}
 
 	/**
-	 * Create a new key pair.
-	 * Delete the old one if still presents.
+	 * Create a new key pair. Delete the old one if still presents.
 	 */
 	private void createKeyPair() {
 		Log.e(TAG, "TODO : createKeyPair()");
 	}
 
 	/**
-	 * Import a file in the 
+	 * Import a file in the
 	 */
 	private void importFile() {
 		Log.e(TAG, "TODO : importFile()");
