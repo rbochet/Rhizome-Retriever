@@ -45,35 +45,29 @@ public class Main extends ListActivity {
 			Environment.getExternalStorageDirectory()
 					+ "/serval-rhizome-export");
 
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	/**
+	 * Create a new key pair. Delete the old one if still presents.
+	 */
+	private void createKeyPair() {
+		Log.e(TAG, "TODO : createKeyPair()");
+	}
 
-		Log.v(TAG, "Launch the listing");
-		listFiles();
+	/**
+	 * Display a toast message in a short popup
+	 * 
+	 * @param text
+	 *            The text displayed
+	 */
+	private void goToast(String text) {
+		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT)
+				.show();
+	}
 
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, fList));
-
-		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
-
-		// The click behavior
-		lv.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.v(TAG, rList[(int) id].getFile().toString());
-
-				// Process the click
-				processClick(position, id);
-
-			}
-		});
-
-		// Register the context menu
-		registerForContextMenu(getListView());
-
+	/**
+	 * Import a file in the
+	 */
+	private void importFile() {
+		Log.e(TAG, "TODO : importFile()");
 	}
 
 	/**
@@ -111,42 +105,6 @@ public class Main extends ListActivity {
 
 	}
 
-	/**
-	 * Process a short click received from the list view
-	 * 
-	 * @param position
-	 *            The pos of the view in the adapter
-	 * @param id
-	 *            The id in the list view.
-	 */
-	private void processClick(int position, long id) {
-		try {
-			Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW,
-					Uri.parse("file://"
-							+ rList[(int) id].getFile().getAbsolutePath()));
-
-			startActivity(myIntent);
-		} catch (Exception e) {
-			Log.e(TAG, "Not possible to resolve this intent. Shit.");
-			goToast("This file cannot be opened from here.");
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		return true;
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.context_menu, menu);
-	}
-
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
@@ -156,7 +114,16 @@ public class Main extends ListActivity {
 
 		// Delete the file
 		case R.id.cm_delete:
-			rList[(int) info.id].delete();
+			try {
+				rList[(int) info.id].delete();
+				// Need also to reset the UI
+				setUpUI();
+				
+				goToast("Deletion successed.");
+			} catch (IOException e1) {
+				Log.e(TAG, "Deletion failed.");
+				goToast("Deletion failed.");
+			}
 			return true;
 			// Export the file in a known folder
 		case R.id.cm_export:
@@ -176,14 +143,55 @@ public class Main extends ListActivity {
 		}
 	}
 
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setUpUI();
+	}
+	
 	/**
-	 * Display a toast message in a short popup
-	 * 
-	 * @param text The text displayed
+	 * Set up the interface based on the list of files
 	 */
-	private void goToast(String text) {
-		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT)
-				.show();
+	private void setUpUI() {
+		listFiles();
+
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, fList));
+
+		ListView lv = getListView();
+		lv.setTextFilterEnabled(true);
+
+		// The click behavior
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Log.v(TAG, rList[(int) id].getFile().toString());
+
+				// Process the click
+				processClick(position, id);
+
+			}
+		});
+
+		// Register the context menu
+		registerForContextMenu(getListView());
+
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.context_menu, menu);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
 	}
 
 	@Override
@@ -201,16 +209,23 @@ public class Main extends ListActivity {
 	}
 
 	/**
-	 * Create a new key pair. Delete the old one if still presents.
+	 * Process a short click received from the list view
+	 * 
+	 * @param position
+	 *            The pos of the view in the adapter
+	 * @param id
+	 *            The id in the list view.
 	 */
-	private void createKeyPair() {
-		Log.e(TAG, "TODO : createKeyPair()");
-	}
+	private void processClick(int position, long id) {
+		try {
+			Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW,
+					Uri.parse("file://"
+							+ rList[(int) id].getFile().getAbsolutePath()));
 
-	/**
-	 * Import a file in the
-	 */
-	private void importFile() {
-		Log.e(TAG, "TODO : importFile()");
+			startActivity(myIntent);
+		} catch (Exception e) {
+			Log.e(TAG, "Not possible to resolve this intent.s");
+			goToast("This file cannot be opened from here.");
+		}
 	}
 }

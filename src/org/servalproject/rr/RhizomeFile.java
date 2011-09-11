@@ -20,6 +20,42 @@ public class RhizomeFile {
 	/** TAG for debugging */
 	public static final String TAG = "R2";
 
+	/**
+	 * Copy a file.
+	 * 
+	 * @param sourceFile
+	 *            The source
+	 * @param destDir
+	 *            The destination directory
+	 * @throws IOException
+	 *             Everything fails sometimes
+	 */
+	private static void CopyFileToDir(File sourceFile, File destDir)
+			throws IOException {
+
+		File destFile = new File(destDir, sourceFile.getName());
+
+		if (!destFile.exists()) {
+			destFile.createNewFile();
+		}
+
+		FileChannel source = null;
+		FileChannel destination = null;
+
+		try {
+			source = new FileInputStream(sourceFile).getChannel();
+			destination = new FileOutputStream(destFile).getChannel();
+			destination.transferFrom(source, 0, source.size());
+		} finally {
+			if (source != null) {
+				source.close();
+			}
+			if (destination != null) {
+				destination.close();
+			}
+		}
+	}
+
 	/** The actual file */
 	File file = null;
 
@@ -47,6 +83,32 @@ public class RhizomeFile {
 	}
 
 	/**
+	 * Delete the logical file -- ie all 3 files if they exists. If this
+	 * function is called, the object should be destroyed quickly.
+	 * 
+	 * @throws IOException
+	 *             If the deletion fails
+	 */
+	public void delete() throws IOException {
+		file.delete();
+		if (manifest != null)
+			manifest.delete();
+		if (meta != null)
+			meta.delete();
+	}
+
+	/**
+	 * Export the file in the given dir. The directory is defined in the main
+	 * app.
+	 * 
+	 * @throws IOException
+	 *             If the copy fails.
+	 */
+	public void export() throws IOException {
+		CopyFileToDir(file, Main.dirExport);
+	}
+
+	/**
 	 * @return the file path
 	 */
 	public File getFile() {
@@ -65,6 +127,14 @@ public class RhizomeFile {
 	 */
 	public File getMeta() {
 		return meta;
+	}
+
+	/**
+	 * mark the file for expiration
+	 */
+	public void markForExpiration() {
+		Log.e(TAG, "TODO : markForExpiration()");
+
 	}
 
 	/**
@@ -111,69 +181,6 @@ public class RhizomeFile {
 		ts.append("-- EOF --");
 
 		return ts.toString();
-	}
-
-	/**
-	 * Delete the file
-	 */
-	public void delete() {
-		Log.e(TAG, "TODO : delete()");
-	}
-
-	/**
-	 * Export the file in the given dir.
-	 * The directory is defined in the main app.
-	 * 
-	 * @throws IOException
-	 *             If the copy fails.
-	 */
-	public void export() throws IOException {
-		Log.e(TAG, "TODO: export()");
-		CopyFileToDir(file, Main.dirExport);
-	}
-
-	/**
-	 * mark the file for expiration
-	 */
-	public void markForExpiration() {
-		Log.e(TAG, "TODO : markForExpiration()");
-
-	}
-
-	/**
-	 * Copy a file.
-	 * 
-	 * @param sourceFile
-	 *            The source
-	 * @param destFile
-	 *            The dest
-	 * @throws IOException
-	 *             Everything fails sometimes
-	 */
-	private static void CopyFileToDir(File sourceFile, File destDir)
-			throws IOException {
-		
-		File destFile = new File(destDir, sourceFile.getName());
-		
-		if (!destFile.exists()) {
-			destFile.createNewFile();
-		}
-
-		FileChannel source = null;
-		FileChannel destination = null;
-
-		try {
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
-		} finally {
-			if (source != null) {
-				source.close();
-			}
-			if (destination != null) {
-				destination.close();
-			}
-		}
 	}
 
 }
