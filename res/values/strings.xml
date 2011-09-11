@@ -26,6 +26,8 @@
 	<string name="mv_date_p">Creation ts:</string>
 	<string name="mv_version_p">Version:</string>
 	<string name="mv_hash_p">Hash:</string>
+	<string name="mv_hash_ok_p">Hash ok?</string>
+	<string name="mv_sign_ok_p">Cert sign?</string>
 	<string name="mv_back">Back</string>
 	<string name="mv_name">View the manifest</string>
 	

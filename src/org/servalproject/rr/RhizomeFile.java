@@ -247,7 +247,7 @@ public class RhizomeFile {
 			// The locally computed
 			manifestP.put("size", new File(Main.dirRhizome, fileName).length()
 					+ "");
-			manifestP.put("hash", toHexString(digestFile(new File(Main.dirRhizome, fileName))));
+			manifestP.put("hash", ToHexString(DigestFile(new File(Main.dirRhizome, fileName))));
 
 			// Save the file
 			File tmpManifest = new File(Main.dirRhizome, "." + fileName
@@ -293,7 +293,7 @@ public class RhizomeFile {
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	static private byte[] digestFile(File file)  {
+	public static byte[] DigestFile(File file)  {
 		byte[] digest = null;
 		try {
 			FileInputStream in = new FileInputStream(file);
@@ -315,7 +315,7 @@ public class RhizomeFile {
 	 * @param digest Digest
 	 * @return Display ready string
 	 */
-    private static String toHexString(byte[] digest) {
+    public static String ToHexString(byte[] digest) {
         StringBuffer hexStr = new StringBuffer(40);
         for (byte b : digest) {
             hexStr.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
