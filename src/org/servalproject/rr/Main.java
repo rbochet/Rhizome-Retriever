@@ -83,6 +83,7 @@ public class Main extends ListActivity implements OnClickListener {
 		try {
 			File file = new File(fileName);
 			RhizomeFile.CopyFileToDir(file, dirRhizome);
+			RhizomeFile.GenerateMetaForFilename(file.getName()); // Just the name, no path
 			// Reset the UI
 			setUpUI();
 			// Alright

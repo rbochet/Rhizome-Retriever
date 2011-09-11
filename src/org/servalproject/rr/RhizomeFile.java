@@ -5,9 +5,11 @@ package org.servalproject.rr;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.Properties;
 
 import android.util.Log;
 
@@ -175,12 +177,38 @@ public class RhizomeFile {
 		StringBuffer ts = new StringBuffer();
 
 		ts.append("-- BOF --\n");
-		ts.append("File:        " + getFile() + "\n");
-		ts.append("-> Manifest: " + getManifest() + "\n");
-		ts.append("-> Meta:     " + getMeta() + "\n");
+		ts.append(" File:        " + getFile() + "\n");
+		ts.append(" -> Manifest: " + getManifest() + "\n");
+		ts.append(" -> Meta:     " + getMeta() + "\n");
 		ts.append("-- EOF --");
 
 		return ts.toString();
+	}
+
+	/**
+	 * When a file appears (imported or downloaded), this method creates the
+	 * associated meta file. The meta file is only for the current handset. The
+	 * meta file is created in Rhizome home directory.
+	 * 
+	 * @param fileName
+	 *            The name of the incoming file
+	 */
+	public static void GenerateMetaForFilename(String fileName) {
+		try {
+			Properties meta = new Properties();
+			// Setup the property object
+			meta.put("date", System.currentTimeMillis() + "");
+			meta.put("read", false + ""); // the file is just created
+			meta.put("marked_expiration", false + ""); // Just imported
+
+			// Save the file
+			File tmpMeta = new File(Main.dirRhizome, "." + fileName + ".meta");
+			Log.v(TAG, tmpMeta+"");
+			meta.store(new FileOutputStream(tmpMeta), "Rhizome meta data for "
+					+ fileName);
+		} catch (Exception e) {
+			Log.e(TAG, "Error when creating meta for " + fileName);
+		}
 	}
 
 }
