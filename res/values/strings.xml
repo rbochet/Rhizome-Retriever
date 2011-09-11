@@ -23,7 +23,7 @@
 	<string name="mv_name_p">File name: </string>
 	<string name="mv_size_p">Size:</string>
 	<string name="mv_author_p">Author:</string>
-	<string name="mv_date_p">Creation timestamp:</string>
+	<string name="mv_date_p">Creation ts:</string>
 	<string name="mv_version_p">Version:</string>
 	<string name="mv_hash_p">Hash:</string>
 	<string name="mv_back">Back</string>
