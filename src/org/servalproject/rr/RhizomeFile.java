@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
 import android.content.Intent;
@@ -243,8 +245,10 @@ public class RhizomeFile {
 			manifestP.put("version", version + "");
 			manifestP.put("date", System.currentTimeMillis() + "");
 			// The locally computed
-			manifestP.put("size", new File(Main.dirRhizome, fileName).length()+"");
-			
+			manifestP.put("size", new File(Main.dirRhizome, fileName).length()
+					+ "");
+			manifestP.put("hash", toHexString(digestFile(new File(Main.dirRhizome, fileName))));
+
 			// Save the file
 			File tmpManifest = new File(Main.dirRhizome, "." + fileName
 					+ ".manifest");
@@ -261,14 +265,15 @@ public class RhizomeFile {
 	 * This function populates an Intent for the manifest
 	 * 
 	 * @return The manifest wrapped in an Intent
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public Intent populateDisplayIntent(Intent intent) throws FileNotFoundException, IOException {
+	public Intent populateDisplayIntent(Intent intent)
+			throws FileNotFoundException, IOException {
 		// Load the properties
 		Properties manifestP = new Properties();
 		manifestP.load(new FileInputStream(manifest));
-		
+
 		// Populate the intent
 		intent.putExtra("author", manifestP.getProperty("author"));
 		intent.putExtra("hash", manifestP.getProperty("hash"));
@@ -276,7 +281,46 @@ public class RhizomeFile {
 		intent.putExtra("date", manifestP.getProperty("date"));
 		intent.putExtra("size", manifestP.getProperty("size"));
 		intent.putExtra("name", manifestP.getProperty("name"));
-		
+
 		return intent;
 	}
+
+	/**
+	 * Calculates the MD5 digest of the file.
+	 * @param in 
+	 * 
+	 * @return the digest
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 */
+	static private byte[] digestFile(File file)  {
+		byte[] digest = null;
+		try {
+			FileInputStream in = new FileInputStream(file);
+			MessageDigest digester = MessageDigest.getInstance("MD5");
+			byte[] bytes = new byte[8192];
+			int byteCount;
+			while ((byteCount = in.read(bytes)) > 0) {
+				digester.update(bytes, 0, byteCount);
+			}
+			digest = digester.digest();
+		} catch (Exception e) {
+			Log.e(TAG, "Error with hashing "+file.getName());
+		}
+		return digest;
+	}
+	
+	/**
+	 * Transforms a byte array in a hex string
+	 * @param digest Digest
+	 * @return Display ready string
+	 */
+    private static String toHexString(byte[] digest) {
+        StringBuffer hexStr = new StringBuffer(40);
+        for (byte b : digest) {
+            hexStr.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+        }
+        return hexStr.toString();
+    }
+
 }
