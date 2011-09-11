@@ -5,6 +5,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 import android.app.ListActivity;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,9 +29,14 @@ import android.widget.Toast;
  * Rhizome Retriever main activity. Extends ListActivity to be able to list the
  * files in a table.
  * 
+ * 
  * @author rbochet
  */
-public class Main extends ListActivity {
+public class Main extends ListActivity implements OnClickListener {
+
+	/** The file picker dialog */
+	private FolderPicker mFileDialog;
+
 
 	/** TAG for debugging */
 	public static final String TAG = "R2";
@@ -68,6 +75,9 @@ public class Main extends ListActivity {
 	 */
 	private void importFile() {
 		Log.e(TAG, "TODO : importFile()");
+		mFileDialog = new FolderPicker(this, this, android.R.style.Theme, true);
+		mFileDialog.show();
+
 	}
 
 	/**
@@ -118,7 +128,7 @@ public class Main extends ListActivity {
 				rList[(int) info.id].delete();
 				// Need also to reset the UI
 				setUpUI();
-				
+
 				goToast("Deletion successed.");
 			} catch (IOException e1) {
 				Log.e(TAG, "Deletion failed.");
@@ -147,9 +157,11 @@ public class Main extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setUpUI();
+
 	}
-	
+
 	/**
 	 * Set up the interface based on the list of files
 	 */
@@ -227,5 +239,17 @@ public class Main extends ListActivity {
 			Log.e(TAG, "Not possible to resolve this intent.s");
 			goToast("This file cannot be opened from here.");
 		}
+	}
+
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		if (dialog == mFileDialog) { // security, not really needed
+			String path = mFileDialog.getPath();
+			if (path == null) {
+				path = "no file selected";
+			}
+			goToast(path);
+		}
+
 	}
 }

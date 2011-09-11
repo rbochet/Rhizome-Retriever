@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Main!</string>
-    <string name="app_name">Rhizome Retriever</string>
-    <string name="m_import">Import</string>
-    <string name="m_new_keys">KeyGen</string>
-    <string name="cm_export">Export</string>
-    <string name="cm_delete">Delete</string>
-    <string name="cm_mark">Mark for expiration</string>
+	<string name="hello">Hello World, Main!</string>
+	<string name="app_name">Rhizome Retriever</string>
+	<!-- For the menu -->
+	<string name="m_import">Import</string>
+	<string name="m_new_keys">KeyGen</string>
+	<!-- For the context menu -->
+	<string name="cm_export">Export</string>
+	<string name="cm_delete">Delete</string>
+	<string name="cm_mark">Mark for expiration</string>
+	<!-- For the picker -->
+	<string name="pick_file">Pick File</string>
+	<string name="pick_folder">Pick Folder</string>
 </resources>
