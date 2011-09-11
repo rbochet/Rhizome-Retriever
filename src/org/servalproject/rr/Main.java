@@ -13,8 +13,10 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -61,24 +63,10 @@ public class Main extends ListActivity {
 				processClick(position, id);
 
 			}
-		}); 
-		
+		});
+
+		// Register the context menu
 		registerForContextMenu(getListView());
-
-		// The long press behavior
-		/*lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-
-				Log.v(TAG, rList[(int) id].getFile().toString());
-
-				// process the long click
-				processLongClick(position, id);
-				// If false is returned, click takes over
-				return true;
-			}
-		});*/
 
 	}
 
@@ -118,20 +106,6 @@ public class Main extends ListActivity {
 	}
 
 	/**
-	 * Process a long click received from the list view
-	 * 
-	 * @param position
-	 *            The pos of the view in the adapter
-	 * @param id
-	 *            The id in the list view.
-	 */
-	private void processLongClick(int position, long id) {
-		Toast.makeText(getApplicationContext(), "Long click",
-				Toast.LENGTH_SHORT).show();
-
-	}
-
-	/**
 	 * Process a short click received from the list view
 	 * 
 	 * @param position
@@ -164,9 +138,32 @@ public class Main extends ListActivity {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
-	                                ContextMenuInfo menuInfo) {
-	  super.onCreateContextMenu(menu, v, menuInfo);
-	  MenuInflater inflater = getMenuInflater();
-	  inflater.inflate(R.menu.context_menu, menu);
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.context_menu, menu);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		Log.v(TAG, "Context menu pressed: "+info.id);
+		switch (item.getItemId()) {
+		
+		// Delete the file
+		case R.id.cm_delete:
+			rList[(int)info.id].delete();
+			return true;
+		// Export the file in a known folder
+		case R.id.cm_export:
+			rList[(int)info.id].export();
+			return true;
+		case R.id.cm_mark:
+			rList[(int)info.id].markForExpiration();
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
 	}
 }

@@ -5,11 +5,16 @@ package org.servalproject.rr;
 
 import java.io.File;
 
+import android.util.Log;
+
 /**
  * @author rbochet A Rhizome logical file is composed by three files : - The
  *         actual file (ie <file>) - The .<file>.manifest - The .<file>.meta
  */
 public class RhizomeFile {
+	
+	/** TAG for debugging */
+	public static final String TAG = "R2";
 
 	/** The actual file */
 	File file = null;
@@ -102,6 +107,29 @@ public class RhizomeFile {
 		ts.append("-- EOF --");
 
 		return ts.toString();
+	}
+
+	/**
+	 * Delete the file
+	 */
+	public void delete() {
+		Log.e(TAG, "TODO : delete()");
+	}
+
+	/**
+	 * Export the file in the given rep
+	 */
+	public void export() {
+		Log.e(TAG, "TODO : export()");
+		
+	}
+
+	/**
+	 * mark the file for expiration
+	 */
+	public void markForExpiration() {
+		Log.e(TAG, "TODO : markForExpiration()");
+		
 	}
 
 }
