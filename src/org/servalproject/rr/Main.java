@@ -12,9 +12,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -47,27 +47,31 @@ public class Main extends ListActivity {
 		ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
 
+		// The click behavior
 		lv.setOnItemClickListener(new OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// When clicked, show a toast with the TextView text
-
-				Log.v(TAG, "ID :: " + id);
 				Log.v(TAG, rList[(int) id].getFile().toString());
 
-				try {
-					Intent myIntent = new Intent(
-							android.content.Intent.ACTION_VIEW, Uri.parse("file://"
-									+ rList[(int) id].getFile().getAbsolutePath()));
+				// Process the click
+				processClick(position, id);
 
-					startActivity(myIntent);
-				} catch (Exception e) {
-					Log.e(TAG, "Not possible to resolve this intent. Shit.");
-					Toast.makeText(getApplicationContext(),
-							"This file cannot be opened from here.", Toast.LENGTH_SHORT).show();
+			}
+		});
 
-				}
+		// The long press behavior
+		lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
 
+				Log.v(TAG, rList[(int) id].getFile().toString());
+
+				// process the long click
+				processLongClick(position, id);
+				// If false is returned, click takes over
+				return true;
 			}
 		});
 
@@ -106,5 +110,45 @@ public class Main extends ListActivity {
 			Log.e(TAG, "No serval-rhizome path found on the SD card.");
 		}
 
+	}
+
+	/**
+	 * Process a long click received from the list view
+	 * 
+	 * @param position
+	 *            The pos of the view in the adapter
+	 * @param id
+	 *            The id in the list view.
+	 */
+	private void processLongClick(int position, long id) {
+		Toast.makeText(getApplicationContext(), "Long click",
+				Toast.LENGTH_SHORT).show();
+
+	}
+	
+	/**
+	 * Process a short click received from the list view
+	 * 
+	 * @param position
+	 *            The pos of the view in the adapter
+	 * @param id
+	 *            The id in the list view.
+	 */
+	private void processClick(int position, long id) {
+		try {
+			Intent myIntent = new Intent(
+					android.content.Intent.ACTION_VIEW, Uri
+							.parse("file://"
+									+ rList[(int) id].getFile()
+											.getAbsolutePath()));
+
+			startActivity(myIntent);
+		} catch (Exception e) {
+			Log.e(TAG, "Not possible to resolve this intent. Shit.");
+			Toast.makeText(getApplicationContext(),
+					"This file cannot be opened from here.",
+					Toast.LENGTH_SHORT).show();
+
+		}
 	}
 }
