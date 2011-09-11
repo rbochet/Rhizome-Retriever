@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import android.app.ListActivity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -25,9 +27,13 @@ public class Main extends ListActivity {
 
 	/** TAG for debugging */
 	public static final String TAG = "R2";
-	
-	String[] fList;
-	
+
+	/** The list of file names */
+	String[] fList = null;
+
+	/** The list of logical files */
+	RhizomeFile[] rList = null;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,10 +41,8 @@ public class Main extends ListActivity {
 
 		Log.v(TAG, "Launch the listing");
 		listFiles();
-		
-		
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item,
-				fList));
+
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, fList));
 
 		ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
@@ -47,10 +51,25 @@ public class Main extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// When clicked, show a toast with the TextView text
-				Toast.makeText(getApplicationContext(),
-						((TextView) view).getText(), Toast.LENGTH_SHORT).show();
+
+				Log.v(TAG, "ID :: " + id);
+				Log.v(TAG, rList[(int) id].getFile().toString());
+
+				try {
+					Intent myIntent = new Intent(
+							android.content.Intent.ACTION_VIEW, Uri.parse("file://"
+									+ rList[(int) id].getFile().getAbsolutePath()));
+
+					startActivity(myIntent);
+				} catch (Exception e) {
+					Log.e(TAG, "Not possible to resolve this intent. Shit.");
+					Toast.makeText(getApplicationContext(),
+							"This file cannot be opened from here.", Toast.LENGTH_SHORT).show();
+
+				}
+
 			}
-		}); 
+		});
 
 	}
 
@@ -76,7 +95,7 @@ public class Main extends ListActivity {
 			// List of the relative paths
 			fList = path.list(filter);
 			// List of the RhizomeFile
-			RhizomeFile[] rList = new RhizomeFile[fList.length];
+			rList = new RhizomeFile[fList.length];
 
 			for (int i = 0; i < rList.length; i++) {
 				rList[i] = new RhizomeFile(path, fList[i]);
