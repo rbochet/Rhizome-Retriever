@@ -233,7 +233,7 @@ public class RhizomeFile {
 	 * @param size
 	 */
 	public static void GenerateManifestForFilename(String fileName,
-			String author, float version, long size) {
+			String author, float version) {
 		try {
 			Properties manifestP = new Properties();
 
@@ -242,7 +242,8 @@ public class RhizomeFile {
 			manifestP.put("name", fileName);
 			manifestP.put("version", version + "");
 			manifestP.put("date", System.currentTimeMillis() + "");
-			manifestP.put("size", size + "");
+			// The locally computed
+			manifestP.put("size", new File(Main.dirRhizome, fileName).length()+"");
 			
 			// Save the file
 			File tmpManifest = new File(Main.dirRhizome, "." + fileName

@@ -98,7 +98,6 @@ public class Main extends ListActivity implements OnClickListener {
 			Intent myIntent = new Intent(this.getBaseContext(),
 					ManifestEditorActivity.class);
 			myIntent.putExtra("fileName", file.getName());
-			myIntent.putExtra("size", file.length());
 			startActivityForResult(myIntent, FILL_MANIFEST);
 			// --> the result will be back in onAcRes
 
@@ -147,14 +146,13 @@ public class Main extends ListActivity implements OnClickListener {
 			if (resultCode == RESULT_OK) {
 				// Get the parameters
 				String fileName = data.getExtras().getString("fileName");
-				long size = data.getExtras().getLong("size");
 				String author = data.getExtras().getString("author");
 				float version = Float.parseFloat(data.getExtras().getString(
 						"version"));
 
 				// Creates the manifest
 				RhizomeFile.GenerateManifestForFilename(fileName, author,
-						version, size);
+						version);
 				// Reset the UI
 				setUpUI();
 				// Alright
