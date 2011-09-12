@@ -213,8 +213,9 @@ public class Main extends ListActivity implements OnClickListener {
 		case R.id.cm_vcert:
 			try {
 				// Create the empty intent
-				Intent intent = new Intent(this.getBaseContext(), ManifestViewActivity.class);
-				// Populate it 
+				Intent intent = new Intent(this.getBaseContext(),
+						ManifestViewActivity.class);
+				// Populate it
 				intent = rList[(int) info.id].populateDisplayIntent(intent);
 				// Send it
 				startActivity(intent);
@@ -233,8 +234,28 @@ public class Main extends ListActivity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// Creates the path folders if they dont exist
+		setUpDirectories();
+
+		// Setup the UI
 		setUpUI();
 
+	}
+
+	/**
+	 * Set up the directories dirRhizome and dirExport if they dont exist yet.
+	 */
+	private void setUpDirectories() {
+		if (!Main.dirRhizome.isDirectory()) {
+			Main.dirRhizome.mkdirs();
+			Log.i(TAG, "Rhizome folder (" + Main.dirRhizome
+					+ ") has been created");
+		}
+		if (!Main.dirExport.isDirectory()) {
+			Main.dirExport.mkdirs();
+			Log.i(TAG, "Rhizome export folder (" + Main.dirExport
+					+ ") has been created");
+		}
 	}
 
 	@Override
