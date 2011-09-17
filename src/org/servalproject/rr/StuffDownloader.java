@@ -16,13 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 /**
  * @author rbochet
  * 
  */
-public class StuffDownloader extends Thread {
+public class StuffDownloader {
 
 	/** The repository where we should get the manifest */
 	private String repository;
@@ -38,16 +40,7 @@ public class StuffDownloader extends Thread {
 	 */
 	public StuffDownloader(String repository) {
 		this.repository = repository;
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run() {
-		super.run();
 		Log.v(TAG, "Start downloading from " + this.repository);
 
 		List<String> manifests = fetchManifests();
@@ -115,6 +108,11 @@ public class StuffDownloader extends Thread {
 				RhizomeFile.GenerateMetaForFilename(pManifest
 						.getProperty("name"));
 
+				// Notify the main view that a file has been updated
+				Handler handler = Main.getHandlerInstance();
+				Message updateMessage = handler.obtainMessage(Main.MSG_UPD,
+						pManifest.getProperty("name"));
+				handler.sendMessage(updateMessage);
 			}
 			// Delete the files in the temp dir
 			new RhizomeFile(Main.dirRhizomeTemp, pManifest.getProperty("name"))

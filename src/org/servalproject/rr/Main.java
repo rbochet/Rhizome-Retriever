@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -34,6 +36,9 @@ import android.widget.Toast;
  */
 public class Main extends ListActivity implements OnClickListener {
 
+	/** Main handler reference */
+	private static Handler mHandlerRef;
+
 	/** The file picker dialog */
 	private FolderPicker mFileDialog;
 
@@ -54,18 +59,22 @@ public class Main extends ListActivity implements OnClickListener {
 	/** Rhizome's home directory */
 	public static final File dirRhizome = new File(
 			Environment.getExternalStorageDirectory() + "/serval-rhizome");
-	
 
 	/** Rhizome's temp directory for manifests download */
 	public static final File dirRhizomeTemp = new File(
 			Environment.getExternalStorageDirectory() + "/serval-rhizome-temp");
-
 
 	/**
 	 * Var used to ensure that the return of the activity comes from the
 	 * manifest filling view
 	 */
 	private static final int FILL_MANIFEST = 0;
+
+	/** Handler constant for an error */
+	protected static final int MSG_ERR = 10;
+
+	/** Handler constant for a file update */
+	protected static final int MSG_UPD = 11;
 
 	/**
 	 * Create a new key pair. Delete the old one if still presents.
@@ -239,16 +248,18 @@ public class Main extends ListActivity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		// Set up the downloading thing
-		StuffDownloader sd = new StuffDownloader(TAG);
-		sd.start();
+		// Setup the main handler reference
+		Main.mHandlerRef = this.mHandler;
 
 		// Creates the path folders if they dont exist
 		setUpDirectories();
 
 		// Setup the UI
 		setUpUI();
+
+		// Launch the updater thread
+		PeerWatcher pWatcher = new PeerWatcher();
+		pWatcher.start();
 
 	}
 
@@ -326,7 +337,9 @@ public class Main extends ListActivity implements OnClickListener {
 	}
 
 	/**
-	 * Set up the interface based on the list of files
+	 * Set up the interface based on the list of files. This function is
+	 * synchronized because it can be accessed from this class and from the
+	 * updater Thread.
 	 */
 	private void setUpUI() {
 		listFiles();
@@ -353,4 +366,34 @@ public class Main extends ListActivity implements OnClickListener {
 		registerForContextMenu(getListView());
 
 	}
+
+	/**
+	 * Get the main class' handler reference.
+	 * 
+	 * @return the reference
+	 */
+	protected static Handler getHandlerInstance() {
+		return Main.mHandlerRef;
+	}
+
+	/**
+	 * Handle the message for the updating the view and warning about error and
+	 * updates.
+	 */
+	public  final Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case MSG_UPD: // It's an update
+				setUpUI();
+				goToast("Update: " + (String) msg.obj);
+				break;
+			case MSG_ERR: //It's an error
+				goToast("Error: " + (String) msg.obj);
+				break;
+			default: // should never happen
+				break;
+			}
+		}
+	};
+
 }
