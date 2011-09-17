@@ -233,6 +233,10 @@ public class Main extends ListActivity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Set up the downloading thing
+		StuffDownloader sd = new StuffDownloader(TAG);
+		sd.start();
 
 		// Creates the path folders if they dont exist
 		setUpDirectories();

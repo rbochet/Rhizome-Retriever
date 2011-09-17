@@ -11,12 +11,14 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+		<!-- manifest view/edit -->
 		<activity android:name="ManifestEditorActivity"
 			android:label="@string/me_name" />
-		<activity android:name="ManifestViewActivity"
-			android:label="@string/mv_name" />
-
+		<activity android:name="ManifestViewActivity" android:label="@string/mv_name" />
 
 	</application>
+
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>
