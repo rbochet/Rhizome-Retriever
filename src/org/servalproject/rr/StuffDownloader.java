@@ -134,12 +134,13 @@ public class StuffDownloader extends Thread {
 			// "Unwrapp" the name
 			String mfName = manifest.split("/")[manifest.split("/").length - 1];
 			// Check if it exists on the local repo
+			Log.v(TAG, new File(Main.dirRhizome, mfName).getAbsolutePath());
 			if (!(new File(Main.dirRhizome, mfName).exists())) {
 				// We add it to the DL list
 				ret.add(manifest);
 			}
 		}
-		return manifests;
+		return ret;
 	}
 
 	/**
