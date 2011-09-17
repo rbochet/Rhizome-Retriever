@@ -50,6 +50,9 @@ public class Main extends ListActivity implements OnClickListener {
 	/** The list of logical files */
 	private RhizomeFile[] rList = null;
 
+	/** The thread that looks for updates */
+	private PeerWatcher pWatcher;
+
 	/**
 	 * Var used to ensure that the return of the activity comes from the
 	 * manifest filling view
@@ -113,8 +116,9 @@ public class Main extends ListActivity implements OnClickListener {
 	 */
 	@Override
 	protected void onDestroy() {
-		Log.i(TAG, "Rhizome's shutting down. Cleaning the tmp directory.");
+		Log.i(TAG, "Rhizome's shutting down. Cleaning the tmp directory & stopping updates.");
 		RhizomeUtils.deleteDirectory(RhizomeUtils.dirRhizomeTemp);
+		pWatcher.stopUpdate();
 		super.onDestroy();
 	}
 
@@ -254,7 +258,7 @@ public class Main extends ListActivity implements OnClickListener {
 		setUpUI();
 
 		// Launch the updater thread
-		PeerWatcher pWatcher = new PeerWatcher();
+		pWatcher = new PeerWatcher();
 		pWatcher.start();
 
 	}

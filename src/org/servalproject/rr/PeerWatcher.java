@@ -22,6 +22,9 @@ public class PeerWatcher extends Thread {
 	/** TAG for debugging */
 	public static final String TAG = "R2";
 
+	/** If the thread works or not */
+	private boolean run = true;
+
 
 	/*
 	 * (non-Javadoc)
@@ -33,7 +36,7 @@ public class PeerWatcher extends Thread {
 		super.run();
 		List<String> repos;
 		// Works forever
-		while (true) {
+		while (run) {
 			Log.v(TAG, "Update procedure launched @ "+ new Date().toLocaleString());
 			
 			repos = getPeersRepo();
@@ -48,6 +51,7 @@ public class PeerWatcher extends Thread {
 			} catch (InterruptedException e) {
 			}
 		}
+		Log.i(TAG, "Updates stop.");
 	}
 
 	/**
@@ -59,6 +63,13 @@ public class PeerWatcher extends Thread {
 		List<String> ret = new ArrayList<String>();
 		ret.add("fake");
 		return ret;
+	}
+
+	/** 
+	 * Stop the thread on the next iteration.
+	 */
+	public void stopUpdate() {
+		run = false;
 	}
 
 }
