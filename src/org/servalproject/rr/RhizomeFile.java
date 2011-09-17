@@ -219,6 +219,7 @@ public class RhizomeFile {
 					+ fileName);
 		} catch (Exception e) {
 			Log.e(TAG, "Error when creating meta for " + fileName);
+			e.printStackTrace();
 		}
 	}
 

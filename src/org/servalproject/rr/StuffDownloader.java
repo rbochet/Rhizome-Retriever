@@ -106,6 +106,9 @@ public class StuffDownloader extends Thread {
 					Main.dirRhizome + "/" + pManifest.getProperty("name"));
 
 			// Check the hash TODO
+			
+			// Generate the meta file for the newly received file
+			RhizomeFile.GenerateMetaForFilename(pManifest.getProperty("name"));
 
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
