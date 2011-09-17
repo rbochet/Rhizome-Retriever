@@ -95,10 +95,20 @@ public class StuffDownloader extends Thread {
 			downloadFile(new URL(file),
 					Main.dirRhizome + "/" + pManifest.getProperty("name"));
 
-			// Check the hash TODO
-
 			// Generate the meta file for the newly received file
 			RhizomeFile.GenerateMetaForFilename(pManifest.getProperty("name"));
+
+			// Check the hash
+			String hash = RhizomeFile.ToHexString(RhizomeFile
+					.DigestFile(new File(Main.dirRhizome + "/"
+							+ pManifest.getProperty("name"))));
+			if (!hash.equals(pManifest.get("hash"))) {
+				// Hell, the hash's wrong! Delete the logical file
+				Log.w(TAG, "Wrong hash detected for manifest " + manifest);
+				new RhizomeFile(Main.dirRhizome, pManifest.getProperty("name"))
+						.delete();
+				Log.v(TAG, "Cleanup done.");
+			}
 
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
@@ -133,22 +143,29 @@ public class StuffDownloader extends Thread {
 				try {
 					// DL the new manifest in a temp directory
 					Log.v(TAG, "Downloading " + manifest);
-					downloadFile(new URL(manifest), Main.dirRhizomeTemp + "/" + mfName);
-					
-					// Compare the two manifests ; if new.version > old.version, DL
+					downloadFile(new URL(manifest), Main.dirRhizomeTemp + "/"
+							+ mfName);
+
+					// Compare the two manifests ; if new.version > old.version,
+					// DL
 					Properties newManifest = new Properties();
-					newManifest.load(new FileInputStream(Main.dirRhizomeTemp + "/" + mfName));
-					float nmversion = Float.parseFloat((String) newManifest.get("version"));
-					
+					newManifest.load(new FileInputStream(Main.dirRhizomeTemp
+							+ "/" + mfName));
+					float nmversion = Float.parseFloat((String) newManifest
+							.get("version"));
+
 					Properties oldManifest = new Properties();
-					oldManifest.load(new FileInputStream(Main.dirRhizome + "/" + mfName));
-					float omversion = Float.parseFloat((String) oldManifest.get("version"));
-					
-					if(nmversion > omversion) {
+					oldManifest.load(new FileInputStream(Main.dirRhizome + "/"
+							+ mfName));
+					float omversion = Float.parseFloat((String) oldManifest
+							.get("version"));
+
+					if (nmversion > omversion) {
 						ret.add(manifest);
 					}
 				} catch (IOException e) {
-					Log.e(TAG, "Error evaluating if the manifest "+manifest+" version.");
+					Log.e(TAG, "Error evaluating if the manifest " + manifest
+							+ " version.");
 					e.printStackTrace();
 				}
 
