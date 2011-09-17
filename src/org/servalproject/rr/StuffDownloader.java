@@ -74,12 +74,13 @@ public class StuffDownloader extends Thread {
 			Log.v(TAG, "Downloading " + manifest);
 			String[] tokenizedUrl = manifest.split("/");
 			String mfName = tokenizedUrl[tokenizedUrl.length - 1];
-			downloadFile(new URL(manifest), Main.dirRhizome + "/" + mfName);
+			downloadFile(new URL(manifest), Main.dirRhizomeTemp + "/" + mfName);
 
 			// Check the key TODO
 			Log.v(TAG, "Loading properties from " + mfName);
 			Properties pManifest = new Properties();
-			pManifest.load(new FileInputStream(Main.dirRhizome + "/" + mfName));
+			pManifest.load(new FileInputStream(Main.dirRhizomeTemp + "/"
+					+ mfName));
 
 			// If alright, compute the actual file URL and name
 			tokenizedUrl[tokenizedUrl.length - 1] = pManifest
@@ -93,26 +94,34 @@ public class StuffDownloader extends Thread {
 			// Download it
 			Log.v(TAG, "Downloading " + file);
 			downloadFile(new URL(file),
-					Main.dirRhizome + "/" + pManifest.getProperty("name"));
-
-			// Generate the meta file for the newly received file
-			RhizomeFile.GenerateMetaForFilename(pManifest.getProperty("name"));
+					Main.dirRhizomeTemp + "/" + pManifest.getProperty("name"));
 
 			// Check the hash
 			String hash = RhizomeFile.ToHexString(RhizomeFile
-					.DigestFile(new File(Main.dirRhizome + "/"
+					.DigestFile(new File(Main.dirRhizomeTemp + "/"
 							+ pManifest.getProperty("name"))));
+
 			if (!hash.equals(pManifest.get("hash"))) {
 				// Hell, the hash's wrong! Delete the logical file
 				Log.w(TAG, "Wrong hash detected for manifest " + manifest);
-				new RhizomeFile(Main.dirRhizome, pManifest.getProperty("name"))
-						.delete();
-				Log.v(TAG, "Cleanup done.");
+			} else { // If it's all right, copy it to the real repo
+				RhizomeFile.CopyFileToDir(new File(Main.dirRhizomeTemp,
+						pManifest.getProperty("name")), Main.dirRhizome);
+
+				RhizomeFile.CopyFileToDir(new File(Main.dirRhizomeTemp + "/"
+						+ mfName), Main.dirRhizome);
+
+				// Generate the meta file for the newly received file
+				RhizomeFile.GenerateMetaForFilename(pManifest
+						.getProperty("name"));
+
 			}
+			// Delete the files in the temp dir
+			new RhizomeFile(Main.dirRhizomeTemp, pManifest.getProperty("name"))
+					.delete();
 
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
