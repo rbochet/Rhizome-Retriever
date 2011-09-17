@@ -10,7 +10,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -50,19 +49,6 @@ public class Main extends ListActivity implements OnClickListener {
 
 	/** The list of logical files */
 	private RhizomeFile[] rList = null;
-
-	/** Directory where the files are exported */
-	public static final File dirExport = new File(
-			Environment.getExternalStorageDirectory()
-					+ "/serval-rhizome-export");
-
-	/** Rhizome's home directory */
-	public static final File dirRhizome = new File(
-			Environment.getExternalStorageDirectory() + "/serval-rhizome");
-
-	/** Rhizome's temp directory for manifests download */
-	public static final File dirRhizomeTemp = new File(
-			Environment.getExternalStorageDirectory() + "/serval-rhizome-temp");
 
 	/**
 	 * Var used to ensure that the return of the activity comes from the
@@ -106,7 +92,7 @@ public class Main extends ListActivity implements OnClickListener {
 		try {
 			File file = new File(fileName);
 			// Move the actual file
-			RhizomeFile.CopyFileToDir(file, dirRhizome);
+			RhizomeUtils.CopyFileToDir(file, RhizomeUtils.dirRhizome);
 			// Create silently the meta data
 			RhizomeFile.GenerateMetaForFilename(file.getName());
 			// Ask data for creating the Manifest
@@ -126,10 +112,10 @@ public class Main extends ListActivity implements OnClickListener {
 	 * List files of the directory serval on the SD Card
 	 */
 	private void listFiles() {
-		Log.v(TAG, dirRhizome.getAbsolutePath());
+		Log.v(TAG, RhizomeUtils.dirRhizome.getAbsolutePath());
 
 		// If the path exists, list all the non-hidden files (no dir)
-		if (dirRhizome.exists()) {
+		if (RhizomeUtils.dirRhizome.exists()) {
 			FilenameFilter filter = new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String filename) {
@@ -139,12 +125,12 @@ public class Main extends ListActivity implements OnClickListener {
 			};
 
 			// List of the relative paths
-			fList = dirRhizome.list(filter);
+			fList = RhizomeUtils.dirRhizome.list(filter);
 			// List of the RhizomeFile
 			rList = new RhizomeFile[fList.length];
 
 			for (int i = 0; i < rList.length; i++) {
-				rList[i] = new RhizomeFile(dirRhizome, fList[i]);
+				rList[i] = new RhizomeFile(RhizomeUtils.dirRhizome, fList[i]);
 				Log.v(TAG, rList[i].toString());
 			}
 
@@ -267,19 +253,19 @@ public class Main extends ListActivity implements OnClickListener {
 	 * Set up the directories dirRhizome and dirExport if they dont exist yet.
 	 */
 	private void setUpDirectories() {
-		if (!Main.dirRhizome.isDirectory()) {
-			Main.dirRhizome.mkdirs();
-			Log.i(TAG, "Rhizome folder (" + Main.dirRhizome
+		if (!RhizomeUtils.dirRhizome.isDirectory()) {
+			RhizomeUtils.dirRhizome.mkdirs();
+			Log.i(TAG, "Rhizome folder (" + RhizomeUtils.dirRhizome
 					+ ") has been created");
 		}
-		if (!Main.dirExport.isDirectory()) {
-			Main.dirExport.mkdirs();
-			Log.i(TAG, "Rhizome export folder (" + Main.dirExport
+		if (!RhizomeUtils.dirExport.isDirectory()) {
+			RhizomeUtils.dirExport.mkdirs();
+			Log.i(TAG, "Rhizome export folder (" + RhizomeUtils.dirExport
 					+ ") has been created");
 		}
-		if (!Main.dirRhizomeTemp.isDirectory()) {
-			Main.dirRhizomeTemp.mkdirs();
-			Log.i(TAG, "Rhizome temp folder (" + Main.dirRhizomeTemp
+		if (!RhizomeUtils.dirRhizomeTemp.isDirectory()) {
+			RhizomeUtils.dirRhizomeTemp.mkdirs();
+			Log.i(TAG, "Rhizome temp folder (" + RhizomeUtils.dirRhizomeTemp
 					+ ") has been created");
 		}
 	}

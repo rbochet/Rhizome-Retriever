@@ -8,9 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
 import android.content.Intent;
@@ -24,42 +21,6 @@ public class RhizomeFile {
 
 	/** TAG for debugging */
 	public static final String TAG = "R2";
-
-	/**
-	 * Copy a file.
-	 * 
-	 * @param sourceFile
-	 *            The source
-	 * @param destDir
-	 *            The destination directory
-	 * @throws IOException
-	 *             Everything fails sometimes
-	 */
-	protected static void CopyFileToDir(File sourceFile, File destDir)
-			throws IOException {
-
-		File destFile = new File(destDir, sourceFile.getName());
-
-		if (!destFile.exists()) {
-			destFile.createNewFile();
-		}
-
-		FileChannel source = null;
-		FileChannel destination = null;
-
-		try {
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
-		} finally {
-			if (source != null) {
-				source.close();
-			}
-			if (destination != null) {
-				destination.close();
-			}
-		}
-	}
 
 	/** The actual file */
 	File file = null;
@@ -110,7 +71,7 @@ public class RhizomeFile {
 	 *             If the copy fails.
 	 */
 	public void export() throws IOException {
-		CopyFileToDir(file, Main.dirExport);
+		RhizomeUtils.CopyFileToDir(file, RhizomeUtils.dirExport);
 	}
 
 	/**
@@ -213,7 +174,7 @@ public class RhizomeFile {
 			metaP.put("marked_expiration", false + ""); // Just imported
 
 			// Save the file
-			File tmpMeta = new File(Main.dirRhizome, "." + fileName + ".meta");
+			File tmpMeta = new File(RhizomeUtils.dirRhizome, "." + fileName + ".meta");
 			Log.v(TAG, tmpMeta + "");
 			metaP.store(new FileOutputStream(tmpMeta), "Rhizome meta data for "
 					+ fileName);
@@ -246,12 +207,12 @@ public class RhizomeFile {
 			manifestP.put("version", version + "");
 			manifestP.put("date", System.currentTimeMillis() + "");
 			// The locally computed
-			manifestP.put("size", new File(Main.dirRhizome, fileName).length()
+			manifestP.put("size", new File(RhizomeUtils.dirRhizome, fileName).length()
 					+ "");
-			manifestP.put("hash", ToHexString(DigestFile(new File(Main.dirRhizome, fileName))));
+			manifestP.put("hash", RhizomeUtils.ToHexString(RhizomeUtils.DigestFile(new File(RhizomeUtils.dirRhizome, fileName))));
 
 			// Save the file
-			File tmpManifest = new File(Main.dirRhizome, "." + fileName
+			File tmpManifest = new File(RhizomeUtils.dirRhizome, "." + fileName
 					+ ".manifest");
 			Log.v(TAG, tmpManifest + "");
 			manifestP.store(new FileOutputStream(tmpManifest),
@@ -285,43 +246,5 @@ public class RhizomeFile {
 
 		return intent;
 	}
-
-	/**
-	 * Calculates the MD5 digest of the file.
-	 * @param in 
-	 * 
-	 * @return the digest
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
-	 */
-	public static byte[] DigestFile(File file)  {
-		byte[] digest = null;
-		try {
-			FileInputStream in = new FileInputStream(file);
-			MessageDigest digester = MessageDigest.getInstance("MD5");
-			byte[] bytes = new byte[8192];
-			int byteCount;
-			while ((byteCount = in.read(bytes)) > 0) {
-				digester.update(bytes, 0, byteCount);
-			}
-			digest = digester.digest();
-		} catch (Exception e) {
-			Log.e(TAG, "Error with hashing "+file.getName());
-		}
-		return digest;
-	}
-	
-	/**
-	 * Transforms a byte array in a hex string
-	 * @param digest Digest
-	 * @return Display ready string
-	 */
-    public static String ToHexString(byte[] digest) {
-        StringBuffer hexStr = new StringBuffer(40);
-        for (byte b : digest) {
-            hexStr.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-        }
-        return hexStr.toString();
-    }
 
 }

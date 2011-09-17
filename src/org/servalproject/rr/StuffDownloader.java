@@ -67,12 +67,12 @@ public class StuffDownloader {
 			Log.v(TAG, "Downloading " + manifest);
 			String[] tokenizedUrl = manifest.split("/");
 			String mfName = tokenizedUrl[tokenizedUrl.length - 1];
-			downloadFile(new URL(manifest), Main.dirRhizomeTemp + "/" + mfName);
+			downloadFile(new URL(manifest), RhizomeUtils.dirRhizomeTemp + "/" + mfName);
 
 			// Check the key TODO
 			Log.v(TAG, "Loading properties from " + mfName);
 			Properties pManifest = new Properties();
-			pManifest.load(new FileInputStream(Main.dirRhizomeTemp + "/"
+			pManifest.load(new FileInputStream(RhizomeUtils.dirRhizomeTemp + "/"
 					+ mfName));
 
 			// If alright, compute the actual file URL and name
@@ -87,22 +87,22 @@ public class StuffDownloader {
 			// Download it
 			Log.v(TAG, "Downloading " + file);
 			downloadFile(new URL(file),
-					Main.dirRhizomeTemp + "/" + pManifest.getProperty("name"));
+					RhizomeUtils.dirRhizomeTemp + "/" + pManifest.getProperty("name"));
 
 			// Check the hash
-			String hash = RhizomeFile.ToHexString(RhizomeFile
-					.DigestFile(new File(Main.dirRhizomeTemp + "/"
+			String hash = RhizomeUtils.ToHexString(RhizomeUtils
+					.DigestFile(new File(RhizomeUtils.dirRhizomeTemp + "/"
 							+ pManifest.getProperty("name"))));
 
 			if (!hash.equals(pManifest.get("hash"))) {
 				// Hell, the hash's wrong! Delete the logical file
 				Log.w(TAG, "Wrong hash detected for manifest " + manifest);
 			} else { // If it's all right, copy it to the real repo
-				RhizomeFile.CopyFileToDir(new File(Main.dirRhizomeTemp,
-						pManifest.getProperty("name")), Main.dirRhizome);
+				RhizomeUtils.CopyFileToDir(new File(RhizomeUtils.dirRhizomeTemp,
+						pManifest.getProperty("name")), RhizomeUtils.dirRhizome);
 
-				RhizomeFile.CopyFileToDir(new File(Main.dirRhizomeTemp + "/"
-						+ mfName), Main.dirRhizome);
+				RhizomeUtils.CopyFileToDir(new File(RhizomeUtils.dirRhizomeTemp + "/"
+						+ mfName), RhizomeUtils.dirRhizome);
 
 				// Generate the meta file for the newly received file
 				RhizomeFile.GenerateMetaForFilename(pManifest
@@ -115,7 +115,7 @@ public class StuffDownloader {
 				handler.sendMessage(updateMessage);
 			}
 			// Delete the files in the temp dir
-			new RhizomeFile(Main.dirRhizomeTemp, pManifest.getProperty("name"))
+			new RhizomeFile(RhizomeUtils.dirRhizomeTemp, pManifest.getProperty("name"))
 					.delete();
 
 		} catch (MalformedURLException e) {
@@ -143,26 +143,26 @@ public class StuffDownloader {
 			// "Unwrapp" the name
 			String mfName = manifest.split("/")[manifest.split("/").length - 1];
 			// Check if it exists on the local repo
-			if (!(new File(Main.dirRhizome, mfName).exists())) {
+			if (!(new File(RhizomeUtils.dirRhizome, mfName).exists())) {
 				// We add it to the DL list
 				ret.add(manifest);
 			} else { // The manifest already exists ; but is it a new version ?
 				try {
 					// DL the new manifest in a temp directory
 					Log.v(TAG, "Downloading " + manifest);
-					downloadFile(new URL(manifest), Main.dirRhizomeTemp + "/"
+					downloadFile(new URL(manifest), RhizomeUtils.dirRhizomeTemp + "/"
 							+ mfName);
 
 					// Compare the two manifests ; if new.version > old.version,
 					// DL
 					Properties newManifest = new Properties();
-					newManifest.load(new FileInputStream(Main.dirRhizomeTemp
+					newManifest.load(new FileInputStream(RhizomeUtils.dirRhizomeTemp
 							+ "/" + mfName));
 					float nmversion = Float.parseFloat((String) newManifest
 							.get("version"));
 
 					Properties oldManifest = new Properties();
-					oldManifest.load(new FileInputStream(Main.dirRhizome + "/"
+					oldManifest.load(new FileInputStream(RhizomeUtils.dirRhizome + "/"
 							+ mfName));
 					float omversion = Float.parseFloat((String) oldManifest
 							.get("version"));

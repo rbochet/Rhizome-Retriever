@@ -49,8 +49,8 @@ public class ManifestViewActivity extends Activity implements OnClickListener {
 		name_tv.setText(intent.getStringExtra("name"));
 
 		// Compute the hash of the file and compares it to the manifest's one.
-		File f = new File(Main.dirRhizome, intent.getStringExtra("name"));
-		String f_hash = RhizomeFile.ToHexString(RhizomeFile.DigestFile(f));
+		File f = new File(RhizomeUtils.dirRhizome, intent.getStringExtra("name"));
+		String f_hash = RhizomeUtils.ToHexString(RhizomeUtils.DigestFile(f));
 		
 		TextView hash_ok = (TextView) findViewById(R.id.mv_hash_ok);
 		hash_ok.setText(f_hash.equals(intent.getStringExtra("hash"))+"");
