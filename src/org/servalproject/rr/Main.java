@@ -54,6 +54,12 @@ public class Main extends ListActivity implements OnClickListener {
 	/** Rhizome's home directory */
 	public static final File dirRhizome = new File(
 			Environment.getExternalStorageDirectory() + "/serval-rhizome");
+	
+
+	/** Rhizome's temp directory for manifests download */
+	public static final File dirRhizomeTemp = new File(
+			Environment.getExternalStorageDirectory() + "/serval-rhizome-temp");
+
 
 	/**
 	 * Var used to ensure that the return of the activity comes from the
@@ -258,6 +264,11 @@ public class Main extends ListActivity implements OnClickListener {
 		if (!Main.dirExport.isDirectory()) {
 			Main.dirExport.mkdirs();
 			Log.i(TAG, "Rhizome export folder (" + Main.dirExport
+					+ ") has been created");
+		}
+		if (!Main.dirRhizomeTemp.isDirectory()) {
+			Main.dirRhizomeTemp.mkdirs();
+			Log.i(TAG, "Rhizome temp folder (" + Main.dirRhizomeTemp
 					+ ") has been created");
 		}
 	}

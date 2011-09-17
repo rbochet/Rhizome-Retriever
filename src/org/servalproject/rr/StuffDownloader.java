@@ -52,21 +52,11 @@ public class StuffDownloader extends Thread {
 
 		List<String> manifests = fetchManifests();
 
-		Log.v(TAG, "DL proposed");
-		for (String string : manifests) {
-			Log.v(TAG, string);
-		}
-		
 		List<String> dlManifests = chooseManifests(manifests);
 
-		Log.v(TAG, "DL choosed");
-		for (String string : dlManifests) {
-			Log.v(TAG, string);
+		for (String manifest : dlManifests) {
+			dlFile(manifest);
 		}
-		
-		 for (String manifest : dlManifests) {
-			 dlFile(manifest);
-		 }
 
 	}
 
@@ -80,7 +70,7 @@ public class StuffDownloader extends Thread {
 	 */
 	private void dlFile(String manifest) {
 		try {
-			// Download the manifest
+			// Download the manifest in the Rhizome directory
 			Log.v(TAG, "Downloading " + manifest);
 			String[] tokenizedUrl = manifest.split("/");
 			String mfName = tokenizedUrl[tokenizedUrl.length - 1];
@@ -100,13 +90,13 @@ public class StuffDownloader extends Thread {
 			}
 			String file = fileNameB.toString();
 
-			// Download it 
+			// Download it
 			Log.v(TAG, "Downloading " + file);
 			downloadFile(new URL(file),
 					Main.dirRhizome + "/" + pManifest.getProperty("name"));
 
 			// Check the hash TODO
-			
+
 			// Generate the meta file for the newly received file
 			RhizomeFile.GenerateMetaForFilename(pManifest.getProperty("name"));
 
@@ -120,7 +110,9 @@ public class StuffDownloader extends Thread {
 
 	/**
 	 * Choose the interesting manifests among a list of the manifest that can be
-	 * downloaded from an host.
+	 * downloaded from an host. If a manifest doesn't exist in the local FS,
+	 * we'll download it. If a manifest already exists, we'll see if it's a new
+	 * version.
 	 * 
 	 * @param manifests
 	 *            The list of all the manifests URL
@@ -128,16 +120,38 @@ public class StuffDownloader extends Thread {
 	 */
 	private List<String> chooseManifests(List<String> manifests) {
 		List<String> ret = new ArrayList<String>();
-		
+
 		// Iterate
 		for (String manifest : manifests) {
 			// "Unwrapp" the name
 			String mfName = manifest.split("/")[manifest.split("/").length - 1];
 			// Check if it exists on the local repo
-			Log.v(TAG, new File(Main.dirRhizome, mfName).getAbsolutePath());
 			if (!(new File(Main.dirRhizome, mfName).exists())) {
 				// We add it to the DL list
 				ret.add(manifest);
+			} else { // The manifest already exists ; but is it a new version ?
+				try {
+					// DL the new manifest in a temp directory
+					Log.v(TAG, "Downloading " + manifest);
+					downloadFile(new URL(manifest), Main.dirRhizomeTemp + "/" + mfName);
+					
+					// Compare the two manifests ; if new.version > old.version, DL
+					Properties newManifest = new Properties();
+					newManifest.load(new FileInputStream(Main.dirRhizomeTemp + "/" + mfName));
+					float nmversion = Float.parseFloat((String) newManifest.get("version"));
+					
+					Properties oldManifest = new Properties();
+					oldManifest.load(new FileInputStream(Main.dirRhizome + "/" + mfName));
+					float omversion = Float.parseFloat((String) oldManifest.get("version"));
+					
+					if(nmversion > omversion) {
+						ret.add(manifest);
+					}
+				} catch (IOException e) {
+					Log.e(TAG, "Error evaluating if the manifest "+manifest+" version.");
+					e.printStackTrace();
+				}
+
 			}
 		}
 		return ret;
