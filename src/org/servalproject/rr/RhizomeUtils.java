@@ -13,20 +13,22 @@ import android.util.Log;
 
 /**
  * Useful function for the whole Rhizome.
+ * 
  * @author rbochet
- *
+ * 
  */
 public class RhizomeUtils {
 
 	/**
 	 * Calculates the MD5 digest of the file.
-	 * @param in 
+	 * 
+	 * @param in
 	 * 
 	 * @return the digest
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	public static byte[] DigestFile(File file)  {
+	public static byte[] DigestFile(File file) {
 		byte[] digest = null;
 		try {
 			FileInputStream in = new FileInputStream(file);
@@ -38,22 +40,24 @@ public class RhizomeUtils {
 			}
 			digest = digester.digest();
 		} catch (Exception e) {
-			Log.e(RhizomeFile.TAG, "Error with hashing "+file.getName());
+			Log.e(RhizomeFile.TAG, "Error with hashing " + file.getName());
 		}
 		return digest;
 	}
 
 	/**
 	 * Transforms a byte array in a hex string
-	 * @param digest Digest
+	 * 
+	 * @param digest
+	 *            Digest
 	 * @return Display ready string
 	 */
 	public static String ToHexString(byte[] digest) {
-	    StringBuffer hexStr = new StringBuffer(40);
-	    for (byte b : digest) {
-	        hexStr.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-	    }
-	    return hexStr.toString();
+		StringBuffer hexStr = new StringBuffer(40);
+		for (byte b : digest) {
+			hexStr.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+		}
+		return hexStr.toString();
 	}
 
 	/**
@@ -68,16 +72,16 @@ public class RhizomeUtils {
 	 */
 	protected static void CopyFileToDir(File sourceFile, File destDir)
 			throws IOException {
-	
+
 		File destFile = new File(destDir, sourceFile.getName());
-	
+
 		if (!destFile.exists()) {
 			destFile.createNewFile();
 		}
-	
+
 		FileChannel source = null;
 		FileChannel destination = null;
-	
+
 		try {
 			source = new FileInputStream(sourceFile).getChannel();
 			destination = new FileOutputStream(destFile).getChannel();
@@ -92,6 +96,29 @@ public class RhizomeUtils {
 		}
 	}
 
+	/**
+	 * Delete a directory and its content.
+	 * 
+	 * @param path
+	 *            The directory to delete.
+	 */
+	static public void deleteDirectory(File path) {
+		if (path.exists()) {
+			File[] files = path.listFiles();
+			if (files == null) {
+				return;
+			}
+			for (int i = 0; i < files.length; i++) {
+				if (files[i].isDirectory()) {
+					deleteDirectory(files[i]);
+				} else {
+					files[i].delete();
+				}
+			}
+		}
+		path.delete();
+	}
+
 	/** Directory where the files are exported */
 	public static final File dirExport = new File(
 			Environment.getExternalStorageDirectory()
@@ -102,7 +129,5 @@ public class RhizomeUtils {
 	/** Rhizome's temp directory for manifests download */
 	public static final File dirRhizomeTemp = new File(
 			Environment.getExternalStorageDirectory() + "/serval-rhizome-temp");
-	
-	
 
 }

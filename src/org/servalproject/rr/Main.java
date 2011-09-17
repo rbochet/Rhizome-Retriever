@@ -108,6 +108,16 @@ public class Main extends ListActivity implements OnClickListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+		Log.i(TAG, "Rhizome's shutting down. Cleaning the tmp directory.");
+		RhizomeUtils.deleteDirectory(RhizomeUtils.dirRhizomeTemp);
+		super.onDestroy();
+	}
+
 	/**
 	 * List files of the directory serval on the SD Card
 	 */
