@@ -5,6 +5,7 @@
 	<!-- For the menu -->
 	<string name="m_import">Import</string>
 	<string name="m_new_keys">KeyGen</string>
+	<string name="m_reinit_list">Reinit. excl. list</string>
 	<!-- For the context menu -->
 	<string name="cm_export">Export</string>
 	<string name="cm_delete">Delete</string>

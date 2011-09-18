@@ -109,12 +109,15 @@ public class Main extends ListActivity implements OnClickListener {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onDestroy()
 	 */
 	@Override
 	protected void onDestroy() {
-		Log.i(TAG, "Rhizome's shutting down. Cleaning the tmp directory & stopping updates.");
+		Log.i(TAG,
+				"Rhizome's shutting down. Cleaning the tmp directory & stopping updates.");
 		RhizomeUtils.deleteDirectory(RhizomeUtils.dirRhizomeTemp);
 		pWatcher.stopUpdate();
 		super.onDestroy();
@@ -311,9 +314,46 @@ public class Main extends ListActivity implements OnClickListener {
 		case R.id.m_new_keys:
 			createKeyPair();
 			return true;
+		case R.id.m_reinit_list:
+			reinitExclusionList();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	/**
+	 * Reinitialize the exclusion list by deleting all the meta files that dont
+	 * belong to an existing file (ie that dont have a companion manifest file).
+	 */
+	private void reinitExclusionList() {
+		String[] metaList;
+
+		// We keep just the meta files
+		FilenameFilter filter = new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String filename) {
+				File sel = new File(dir, filename);
+				return (sel.isFile() && filename.endsWith("meta"));
+			}
+		};
+
+		// List of the relative paths
+		metaList = RhizomeUtils.dirRhizome.list(filter);
+		for (String metaPath : metaList) {
+			// Look for the manifest
+			String manifestPath = metaPath.substring(0, metaPath.length()
+					- "meta".length())
+					+ "manifest";
+
+			// If the manifest doesn't exist, delete also the meta
+			if (!new File(RhizomeUtils.dirRhizome, manifestPath).exists()) {
+				Log.v(TAG, metaPath);
+				new File(RhizomeUtils.dirRhizome, metaPath).delete();
+			}
+		}
+		goToast("Exclusion list reinitialized.");
+
 	}
 
 	/**
@@ -381,14 +421,14 @@ public class Main extends ListActivity implements OnClickListener {
 	 * Handle the message for the updating the view and warning about error and
 	 * updates.
 	 */
-	public  final Handler mHandler = new Handler() {
+	public final Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_UPD: // It's an update
 				setUpUI();
 				goToast("Update: " + (String) msg.obj);
 				break;
-			case MSG_ERR: //It's an error
+			case MSG_ERR: // It's an error
 				goToast("Error: " + (String) msg.obj);
 				break;
 			default: // should never happen
