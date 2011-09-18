@@ -96,8 +96,6 @@ public class Main extends ListActivity implements OnClickListener {
 			File file = new File(fileName);
 			// Move the actual file
 			RhizomeUtils.CopyFileToDir(file, RhizomeUtils.dirRhizome);
-			// Create silently the meta data
-			RhizomeFile.GenerateMetaForFilename(file.getName());
 			// Ask data for creating the Manifest
 			Intent myIntent = new Intent(this.getBaseContext(),
 					ManifestEditorActivity.class);
@@ -168,6 +166,9 @@ public class Main extends ListActivity implements OnClickListener {
 				// Creates the manifest
 				RhizomeFile.GenerateManifestForFilename(fileName, author,
 						version);
+				// Create silently the meta data
+				RhizomeFile.GenerateMetaForFilename(fileName, version);
+
 				// Reset the UI
 				setUpUI();
 				// Alright

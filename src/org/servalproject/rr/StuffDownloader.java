@@ -107,8 +107,9 @@ public class StuffDownloader {
 						+ "/" + mfName), RhizomeUtils.dirRhizome);
 
 				// Generate the meta file for the newly received file
-				RhizomeFile.GenerateMetaForFilename(pManifest
-						.getProperty("name"));
+				RhizomeFile.GenerateMetaForFilename(
+						pManifest.getProperty("name"),
+						Float.parseFloat((String) pManifest.get("version")));
 
 				// Notify the main view that a file has been updated
 				Handler handler = Main.getHandlerInstance();
@@ -131,9 +132,9 @@ public class StuffDownloader {
 
 	/**
 	 * Choose the interesting manifests among a list of the manifest that can be
-	 * downloaded from an host. If a manifest doesn't exist in the local FS,
-	 * we'll download it. If a manifest already exists, we'll see if it's a new
-	 * version.
+	 * downloaded from an host. If we dont have Manifest nor Meta for this file,
+	 * we'll download it. If we have just the meta, it means the user delete the
+	 * file ; so we download it just if it is a new version.
 	 * 
 	 * @param manifests
 	 *            The list of all the manifests URL
@@ -144,10 +145,11 @@ public class StuffDownloader {
 
 		// Iterate
 		for (String manifest : manifests) {
-			// "Unwrapp" the name
+			// "Unwrapp" the names
 			String mfName = manifest.split("/")[manifest.split("/").length - 1];
+			String metaName = mfName.replace("manifest", "meta");
 			// Check if it exists on the local repo
-			if (!(new File(RhizomeUtils.dirRhizome, mfName).exists())) {
+			if (!(new File(RhizomeUtils.dirRhizome, metaName).exists())) {
 				// We add it to the DL list
 				ret.add(manifest);
 			} else { // The manifest already exists ; but is it a new version ?
@@ -157,7 +159,8 @@ public class StuffDownloader {
 					downloadFile(new URL(manifest), RhizomeUtils.dirRhizomeTemp
 							+ "/" + mfName);
 
-					// Compare the two manifests ; if new.version > old.version,
+					// Compare the new manifest to the old meta ; if new.version
+					// > old.version,
 					// DL
 					Properties newManifest = new Properties();
 					newManifest.load(new FileInputStream(
@@ -165,10 +168,10 @@ public class StuffDownloader {
 					float nmversion = Float.parseFloat((String) newManifest
 							.get("version"));
 
-					Properties oldManifest = new Properties();
-					oldManifest.load(new FileInputStream(
-							RhizomeUtils.dirRhizome + "/" + mfName));
-					float omversion = Float.parseFloat((String) oldManifest
+					Properties oldMeta = new Properties();
+					oldMeta.load(new FileInputStream(RhizomeUtils.dirRhizome
+							+ "/" + metaName));
+					float omversion = Float.parseFloat((String) oldMeta
 							.get("version"));
 
 					if (nmversion > omversion) {

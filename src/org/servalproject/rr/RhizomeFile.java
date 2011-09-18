@@ -59,8 +59,8 @@ public class RhizomeFile {
 		file.delete();
 		if (manifest != null)
 			manifest.delete();
-		if (meta != null)
-			meta.delete();
+//		if (meta != null)
+//			meta.delete();
 	}
 
 	/**
@@ -163,8 +163,9 @@ public class RhizomeFile {
 	 * 
 	 * @param fileName
 	 *            The name of the incoming file
+	 * @param version 
 	 */
-	public static void GenerateMetaForFilename(String fileName) {
+	public static void GenerateMetaForFilename(String fileName, float version) {
 		try {
 			Properties metaP = new Properties();
 
@@ -172,7 +173,8 @@ public class RhizomeFile {
 			metaP.put("date", System.currentTimeMillis() + "");
 			metaP.put("read", false + ""); // the file is just created
 			metaP.put("marked_expiration", false + ""); // Just imported
-
+			metaP.put("version", version +""); 
+			
 			// Save the file
 			File tmpMeta = new File(RhizomeUtils.dirRhizome, "." + fileName + ".meta");
 			Log.v(TAG, tmpMeta + "");
