@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
+import org.jibble.simplewebserver.SimpleWebServer;
+
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -258,13 +260,22 @@ public class Main extends ListActivity implements OnClickListener {
 
 		// Creates the path folders if they dont exist
 		setUpDirectories();
-
+		
 		// Setup the UI
 		setUpUI();
-
+		
 		// Launch the updater thread
 		pWatcher = new PeerWatcher();
 		pWatcher.start();
+		
+		// Start the web server 
+		try {
+			SimpleWebServer server = new SimpleWebServer(RhizomeUtils.dirRhizome, 8080);
+		} catch (IOException e) {
+			goToast("Error starting webserver. Only listening.");
+			e.printStackTrace();
+		}
+
 
 	}
 
