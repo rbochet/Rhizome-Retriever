@@ -16,9 +16,23 @@ $Id: ServerSideScriptEngine.java,v 1.4 2004/02/01 13:37:35 pjm2 Exp $
 
 package org.jibble.simplewebserver;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.URLDecoder;
+import java.util.Date;
+
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 
 /**
  * Copyright Paul Mutton
@@ -27,9 +41,10 @@ import java.util.*;
  */
 public class RequestThread extends Thread {
     
-    public RequestThread(Socket socket, File rootDir) {
+	public RequestThread(Socket socket, File rootDir, String stringIP) {
         _socket = socket;
         _rootDir = rootDir;
+        _stringIP = stringIP;
     }
     
     private static void sendHeader(BufferedOutputStream out, int code, String contentType, long contentLength, long lastModified) throws IOException {
@@ -90,19 +105,15 @@ public class RequestThread extends Thread {
                     path = path + "/";
                 }
                 File[] files = file.listFiles();
+                               
                 sendHeader(out, 200, "text/html", -1, System.currentTimeMillis());
-                String title = "Index of " + path;
-                out.write(("<html><head><title>" + title + "</title></head><body><h3>Index of " + path + "</h3><p>\n").getBytes());
                 for (int i = 0; i < files.length; i++) {
                     file = files[i];
-                    String filename = file.getName();
-                    String description = "";
-                    if (file.isDirectory()) {
-                        description = "&lt;DIR&gt;";
-                    }
-                    out.write(("<a href=\"" + path + filename + "\">" + filename + "</a> " + description + "<br>\n").getBytes());
+                    String filename = file.getName();                    
+                    // Write only the manifest files
+                    if (filename.endsWith("manifest"))
+                    out.write(("http://"+_stringIP+"/"+filename+"\n").getBytes());
                 }
-                out.write(("</p><hr><p>" + SimpleWebServer.VERSION + "</p></body><html>").getBytes());
             }
             else {
                 reader = new BufferedInputStream(new FileInputStream(file));
@@ -138,5 +149,5 @@ public class RequestThread extends Thread {
     
     private File _rootDir;
     private Socket _socket;
-    
+    private String _stringIP;
 }

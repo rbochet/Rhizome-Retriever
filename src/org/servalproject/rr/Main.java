@@ -7,14 +7,18 @@ import java.io.IOException;
 import org.jibble.simplewebserver.SimpleWebServer;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -260,22 +264,28 @@ public class Main extends ListActivity implements OnClickListener {
 
 		// Creates the path folders if they dont exist
 		setUpDirectories();
-		
+
 		// Setup the UI
 		setUpUI();
-		
+
 		// Launch the updater thread
 		pWatcher = new PeerWatcher();
 		pWatcher.start();
-		
-		// Start the web server 
+
+		// Start the web server
 		try {
-			SimpleWebServer server = new SimpleWebServer(RhizomeUtils.dirRhizome, 8080);
+			// Get the wifi address
+			WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+			int ipAddress = wifiInfo.getIpAddress();
+			String stringIP = Formatter.formatIpAddress(ipAddress);
+
+			SimpleWebServer server = new SimpleWebServer(
+					RhizomeUtils.dirRhizome, stringIP, 8080);
 		} catch (IOException e) {
 			goToast("Error starting webserver. Only listening.");
 			e.printStackTrace();
 		}
-
 
 	}
 
@@ -286,12 +296,12 @@ public class Main extends ListActivity implements OnClickListener {
 		// Check first if the storage is available
 		String state = Environment.getExternalStorageState();
 
-		if (! Environment.MEDIA_MOUNTED.equals(state)) {
-		    Log.e(TAG, "Cannot read/write on the FS. Exiting.");
-		    goToast("Cannot read/write on the FS. Exiting.");
-		   //  System.exit(1);
-		} 
-		
+		if (!Environment.MEDIA_MOUNTED.equals(state)) {
+			Log.e(TAG, "Cannot read/write on the FS. Exiting.");
+			goToast("Cannot read/write on the FS. Exiting.");
+			// System.exit(1);
+		}
+
 		if (!RhizomeUtils.dirRhizome.isDirectory()) {
 			RhizomeUtils.dirRhizome.mkdirs();
 			Log.i(TAG, "Rhizome folder (" + RhizomeUtils.dirRhizome

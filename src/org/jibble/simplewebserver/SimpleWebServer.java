@@ -42,12 +42,13 @@ public class SimpleWebServer extends Thread {
         MIME_TYPES.put(".txt", text + "plain");
     }
     
-    public SimpleWebServer(File rootDir, int port) throws IOException {
+    public SimpleWebServer(File rootDir, String stringIP, int port) throws IOException {
         _rootDir = rootDir.getCanonicalFile();
         if (!_rootDir.isDirectory()) {
             throw new IOException("Not a directory.");
         }
         _serverSocket = new ServerSocket(port);
+        _stringIP = stringIP+":"+port;
         start();
     }
     
@@ -55,7 +56,7 @@ public class SimpleWebServer extends Thread {
         while (_running) {
             try {
                 Socket socket = _serverSocket.accept();
-                RequestThread requestThread = new RequestThread(socket, _rootDir);
+                RequestThread requestThread = new RequestThread(socket, _rootDir, _stringIP);
                 requestThread.start();
             }
             catch (IOException e) {
@@ -76,17 +77,10 @@ public class SimpleWebServer extends Thread {
         return extension.toLowerCase();
     }
     
-    public static void main(String[] args) {
-        try {
-            SimpleWebServer server = new SimpleWebServer(new File("./"), 80);
-        }
-        catch (IOException e) {
-            System.out.println(e);
-        }
-    }
     
     private File _rootDir;
     private ServerSocket _serverSocket;
     private boolean _running = true;
+    private String _stringIP;
 
 }
