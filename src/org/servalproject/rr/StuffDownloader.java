@@ -235,6 +235,7 @@ public class StuffDownloader {
 					+ contentLength + " bytes");
 		}
 		// Save it !
+		Log.e(TAG, "PATH :: " + path);
 		FileOutputStream out = new FileOutputStream(path);
 		out.write(data);
 		out.flush();

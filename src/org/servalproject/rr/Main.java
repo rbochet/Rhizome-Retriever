@@ -10,6 +10,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -271,6 +272,15 @@ public class Main extends ListActivity implements OnClickListener {
 	 * Set up the directories dirRhizome and dirExport if they dont exist yet.
 	 */
 	private void setUpDirectories() {
+		// Check first if the storage is available
+		String state = Environment.getExternalStorageState();
+
+		if (! Environment.MEDIA_MOUNTED.equals(state)) {
+		    Log.e(TAG, "Cannot read/write on the FS. Exiting.");
+		    goToast("Cannot read/write on the FS. Exiting.");
+		   //  System.exit(1);
+		} 
+		
 		if (!RhizomeUtils.dirRhizome.isDirectory()) {
 			RhizomeUtils.dirRhizome.mkdirs();
 			Log.i(TAG, "Rhizome folder (" + RhizomeUtils.dirRhizome

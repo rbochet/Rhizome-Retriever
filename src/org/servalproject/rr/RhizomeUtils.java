@@ -121,13 +121,12 @@ public class RhizomeUtils {
 
 	/** Directory where the files are exported */
 	public static final File dirExport = new File(
-			Environment.getExternalStorageDirectory()
-					+ "/serval-rhizome-export");
+			Environment.getExternalStorageDirectory(), "/serval-rhizome-export");
 	/** Rhizome's home directory */
 	public static final File dirRhizome = new File(
-			Environment.getExternalStorageDirectory() + "/serval-rhizome");
+			Environment.getExternalStorageDirectory(), "/serval-rhizome");
 	/** Rhizome's temp directory for manifests download */
 	public static final File dirRhizomeTemp = new File(
-			Environment.getExternalStorageDirectory() + "/serval-rhizome-temp");
+			Environment.getExternalStorageDirectory(), "/serval-rhizome-temp");
 
 }
