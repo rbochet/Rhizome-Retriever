@@ -61,7 +61,7 @@ public class PeerWatcher extends Thread {
 	 */
 	private List<String> getPeersRepo() {
 		List<String> ret = new ArrayList<String>();
-		ret.add("fake");
+		ret.add("http://dl.dropbox.com/u/3505759/serval/repo_exemple.html");
 		return ret;
 	}
 

@@ -112,7 +112,7 @@ public class RequestThread extends Thread {
                     String filename = file.getName();                    
                     // Write only the manifest files
                     if (filename.endsWith("manifest"))
-                    out.write(("http://"+_stringIP+"/"+filename+"\n").getBytes());
+                    out.write(("\nhttp://"+_stringIP+"/"+filename+"\n").getBytes());
                 }
             }
             else {
