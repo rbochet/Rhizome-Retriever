@@ -5,6 +5,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 import org.jibble.simplewebserver.SimpleWebServer;
+import org.servalproject.rr.peers.BatmanPeerList;
+import org.servalproject.rr.peers.BatmanServiceClient;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -18,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Messenger;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -59,6 +62,9 @@ public class Main extends ListActivity implements OnClickListener {
 
 	/** The thread that looks for updates */
 	private PeerWatcher pWatcher;
+	
+	/** Listening port for the server */
+	public static final int SERVER_PORT = 6666;
 
 	/**
 	 * Var used to ensure that the return of the activity comes from the
@@ -267,9 +273,14 @@ public class Main extends ListActivity implements OnClickListener {
 
 		// Setup the UI
 		setUpUI();
-
-		// Launch the updater thread
-		pWatcher = new PeerWatcher();
+		
+		// Setup and start the peer list stuff
+		BatmanPeerList peerList = new BatmanPeerList();
+		BatmanServiceClient bsc = new BatmanServiceClient(getApplicationContext(), peerList);
+		new Thread(bsc).start();
+		
+		// Launch the updater thread with the peer list object
+		pWatcher = new PeerWatcher(peerList);
 		pWatcher.start();
 
 		// Start the web server
@@ -281,7 +292,7 @@ public class Main extends ListActivity implements OnClickListener {
 			String stringIP = Formatter.formatIpAddress(ipAddress);
 
 			SimpleWebServer server = new SimpleWebServer(
-					RhizomeUtils.dirRhizome, stringIP, 8080);
+					RhizomeUtils.dirRhizome, stringIP, 6666);
 		} catch (IOException e) {
 			goToast("Error starting webserver. Only listening.");
 			e.printStackTrace();
